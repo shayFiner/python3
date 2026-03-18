@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כניסה - מערכת ניהול הציוד</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 1rem;
+        }
+
+        .login-card {
+            background-color: white;
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .login-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .form-group input {
+            direction: ltr;
+            padding: 0.875rem;
+        }
+
+        .login-btn {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 0.875rem;
+            font-size: 1rem;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+
+        .demo-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .demo-link:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .demo-credentials {
+            background-color: var(--light-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            font-size: 0.875rem;
+            text-align: right;
+        }
+
+        .demo-credentials p {
+            margin-bottom: 0.5rem;
+        }
+
+        .demo-credentials strong {
+            color: var(--text-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">📦</div>
+                <h1 class="login-title">מערכת ניהול הציוד</h1>
+                <p class="login-subtitle">ניהול מלאי והיסטוריה בקלות</p>
+            </div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">שם משתמש</label>
+                    <input type="text" id="username" name="username" required autofocus>
+                    <span id="usernameError" class="error-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">סיסמה</label>
+                    <input type="password" id="password" name="password" required>
+                    <span id="passwordError" class="error-message"></span>
+                </div>
+
+                <div id="loginError" class="alert alert-error hidden"></div>
+
+                <button type="submit" class="btn btn-primary login-btn">כניסה</button>
+            </form>
+
+            <div id="loginSuccess" class="alert alert-success hidden">
+                כניסתך הצליחה! מחזיר אותך לעמוד הבית...
+            </div>
+
+            <div class="demo-credentials">
+                <p><strong>👤 משתמש רגיל:</strong></p>
+                <p>Username: user | Password: 1234</p>
+                <p style="margin-top: 1rem;"><strong>👨‍💼 מנהל:</strong></p>
+                <p>Username: admin | Password: admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const loginSuccess = document.getElementById('loginSuccess');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Clear previous errors
+            document.getElementById('usernameError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            loginError.classList.add('hidden');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Store token in localStorage
+                    localStorage.setItem('token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    // Show success message
+                    loginSuccess.classList.remove('hidden');
+
+                    // Redirect to dashboard or admin
+                    setTimeout(() => {
+                        if (data.user.is_admin) {
+                            window.location.href = '/admin';
+                        } else {
+                            window.location.href = '/';
+                        }
+                    }, 1000);
+                } else {
+                    const error = await response.json();
+                    loginError.textContent = error.detail || 'שם משתמש או סיסמה שגויים';
+                    loginError.classList.remove('hidden');
+                }
+            } catch (error) {
+                loginError.textContent = 'שגיאה בחיבור לשרת';
+                loginError.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
