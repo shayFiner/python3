@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת ניהול ציוד - Demo</title>
+    <title>מערכת ניהול ציוד</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -11,6 +11,7 @@
             --success: #10b981;
             --danger: #ef4444;
             --warning: #f59e0b;
+            --purple: #7c3aed;
             --bg: #f8fafc;
             --white: #ffffff;
             --text: #1e293b;
@@ -20,645 +21,240 @@
             --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
             --radius: 0.75rem;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); direction: rtl; min-height: 100vh; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            direction: rtl;
-            min-height: 100vh;
-        }
-
-        /* ======== SCREENS ======== */
+        /* SCREENS */
         .screen { display: none; min-height: 100vh; }
         .screen.active { display: flex; flex-direction: column; }
 
-        /* ======== LOGIN ======== */
-        #login-screen {
-            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #be185d 100%);
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
+        /* LOGIN */
+        #login-screen { background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #be185d 100%); align-items: center; justify-content: center; padding: 1rem; }
+        .login-box { background: white; border-radius: 1.5rem; padding: 2.5rem; width: 100%; max-width: 420px; box-shadow: 0 25px 50px rgba(0,0,0,0.25); }
+        .login-logo { text-align: center; margin-bottom: 2rem; }
+        .login-logo .icon { font-size: 3rem; display: block; margin-bottom: 0.5rem; }
+        .login-logo h1 { font-size: 1.5rem; font-weight: 700; color: var(--text); }
+        .login-logo p { color: var(--text-light); font-size: 0.9rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border); border-radius: 0.5rem;
+            font-size: 0.9rem; font-family: inherit; direction: rtl; transition: border-color 0.2s;
         }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
+        .form-group textarea { resize: vertical; min-height: 80px; }
+        .error-msg { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; border-radius: 0.5rem; padding: 0.75rem 1rem; margin-bottom: 1rem; display: none; font-size: 0.9rem; }
+        .error-msg.show { display: block; }
 
-        .login-box {
-            background: white;
-            border-radius: 1.5rem;
-            padding: 2.5rem;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-        }
-
-        .login-logo {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-logo .icon {
-            font-size: 3.5rem;
-            display: block;
-            margin-bottom: 0.75rem;
-        }
-
-        .login-logo h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .login-logo p {
-            color: var(--text-light);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-
-        .form-group { margin-bottom: 1.25rem; }
-
-        .form-group label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.4rem;
-            font-size: 0.9rem;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1.5px solid var(--border);
-            border-radius: 0.6rem;
-            font-size: 1rem;
-            direction: ltr;
-            transition: border-color 0.2s;
-            outline: none;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 0.8rem 1.5rem;
-            border-radius: 0.6rem;
-            border: none;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-
-        .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 0.5rem; }
-        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+        /* BUTTONS */
+        .btn { padding: 0.6rem 1.2rem; border-radius: 0.5rem; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; font-family: inherit; transition: all 0.15s; display: inline-flex; align-items: center; gap: 0.3rem; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem; }
+        .btn-primary:hover { background: var(--primary-dark); }
         .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #059669; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-warning { background: var(--warning); color: white; }
-        .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-ghost { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
         .btn-ghost:hover { background: var(--bg); }
-        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-sm { padding: 0.35rem 0.75rem; font-size: 0.8rem; }
 
-        .demo-hint {
-            background: #f0f9ff;
-            border: 1px solid #bae6fd;
-            border-radius: 0.6rem;
-            padding: 1rem;
-            margin-top: 1.25rem;
-            font-size: 0.85rem;
-        }
+        /* NAVBAR */
+        .navbar { background: white; box-shadow: var(--shadow); padding: 0 1.5rem; display: flex; align-items: center; gap: 1rem; height: 60px; position: sticky; top: 0; z-index: 100; }
+        .navbar-brand { font-weight: 700; font-size: 1.1rem; margin-left: auto; }
+        .navbar-links { list-style: none; display: flex; gap: 0.25rem; }
+        .navbar-links a { padding: 0.4rem 0.85rem; border-radius: 0.4rem; cursor: pointer; font-size: 0.9rem; color: var(--text-light); transition: all 0.15s; }
+        .navbar-links a:hover, .navbar-links a.active { background: #eff6ff; color: var(--primary); font-weight: 600; }
+        .navbar-user { display: flex; align-items: center; gap: 0.75rem; margin-right: auto; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,var(--primary),var(--purple)); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; }
+        .admin-badge { background: linear-gradient(135deg,var(--purple),#be185d); color: white; padding: 0.2rem 0.6rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700; }
 
-        .demo-hint p { margin-bottom: 0.3rem; color: var(--text); }
-        .demo-hint .tag { display: inline-block; background: #0ea5e9; color: white; border-radius: 0.3rem; padding: 0.1rem 0.5rem; font-size: 0.75rem; margin-inline-start: 0.3rem; }
+        /* MAIN CONTENT */
+        .main-content { padding: 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; flex: 1; }
+        .page-title { margin-bottom: 1.5rem; }
+        .page-title h2 { font-size: 1.5rem; font-weight: 700; }
+        .page-title p { color: var(--text-light); margin-top: 0.25rem; }
 
-        .error-msg {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-            display: none;
-        }
+        /* CARDS */
+        .card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem; margin-bottom: 1.25rem; }
+        .card-title { font-weight: 700; font-size: 1rem; margin-bottom: 1rem; }
 
-        /* ======== NAVBAR ======== */
-        .navbar {
-            background: white;
-            border-bottom: 1px solid var(--border);
-            padding: 0 1.5rem;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 50;
-            box-shadow: var(--shadow);
-        }
+        /* STATS */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+        .stat-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.25rem; display: flex; align-items: center; justify-content: space-between; }
+        .stat-label { font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.25rem; }
+        .stat-value { font-size: 1.8rem; font-weight: 700; }
+        .stat-icon { font-size: 2rem; opacity: 0.7; }
 
-        .navbar-brand {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .navbar-links {
-            display: flex;
-            gap: 0.25rem;
-            list-style: none;
-        }
-
-        .navbar-links a {
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            color: var(--text-light);
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .navbar-links a:hover, .navbar-links a.active {
-            background: #eff6ff;
-            color: var(--primary);
-        }
-
-        .navbar-user {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .admin-badge {
-            background: linear-gradient(135deg, #7c3aed, #be185d);
-            color: white;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 9999px;
-            font-weight: 600;
-        }
-
-        /* ======== MAIN CONTENT ======== */
-        .main-content { flex: 1; padding: 2rem 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
-
-        /* ======== CARDS ======== */
-        .card {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* ======== STATS ======== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: white;
-            border-radius: var(--radius);
-            padding: 1.25rem 1.5rem;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .stat-label { color: var(--text-light); font-size: 0.85rem; margin-bottom: 0.4rem; }
-        .stat-value { font-size: 2rem; font-weight: 700; }
-        .stat-icon { font-size: 2.5rem; }
-
-        /* ======== GRID ======== */
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
-
-        /* ======== TABLE ======== */
+        /* TABLE */
         .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        thead th { background: var(--bg); padding: 0.6rem 0.75rem; text-align: right; font-weight: 600; font-size: 0.8rem; color: var(--text-light); border-bottom: 1px solid var(--border); }
+        tbody td { padding: 0.7rem 0.75rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover { background: #f8fafc; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        thead { background: var(--bg); }
-        th { padding: 0.75rem 1rem; text-align: right; font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; }
-        td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
-        tbody tr:hover { background: var(--bg); }
-
-        /* ======== BADGE ======== */
-        .badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-green { background: #d1fae5; color: #065f46; }
+        /* BADGES */
+        .badge { display: inline-block; padding: 0.2rem 0.55rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600; }
+        .badge-green { background: #dcfce7; color: #166534; }
         .badge-red { background: #fee2e2; color: #991b1b; }
-        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-yellow { background: #fef9c3; color: #854d0e; }
         .badge-blue { background: #dbeafe; color: #1e40af; }
-        .badge-purple { background: #ede9fe; color: #5b21b6; }
+        .badge-purple { background: #f3e8ff; color: #6b21a8; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
 
-        /* ======== ADMIN SIDEBAR ======== */
-        .admin-layout {
-            display: flex;
-            gap: 1.5rem;
-            align-items: flex-start;
-        }
-
-        .sidebar {
-            width: 220px;
-            flex-shrink: 0;
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
-            padding: 1rem;
-            position: sticky;
-            top: 80px;
-        }
-
-        .sidebar h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-bottom: 0.75rem; padding: 0 0.5rem; }
-
-        .sidebar-menu { list-style: none; }
-
-        .sidebar-menu li a {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-            padding: 0.6rem 0.75rem;
-            border-radius: 0.5rem;
-            color: var(--text);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .sidebar-menu li a:hover { background: #eff6ff; color: var(--primary); }
-        .sidebar-menu li a.active { background: var(--primary); color: white; }
-
-        .admin-content { flex: 1; min-width: 0; }
-
-        /* ======== TABS ======== */
+        /* TABS */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ======== MODAL ======== */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            padding: 1rem;
-            display: none;
-        }
+        /* ADMIN LAYOUT */
+        .admin-layout { display: flex; gap: 1.5rem; align-items: flex-start; }
+        .sidebar { width: 200px; flex-shrink: 0; background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1rem; position: sticky; top: 75px; }
+        .sidebar h4 { font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu a { display: block; padding: 0.55rem 0.75rem; border-radius: 0.4rem; cursor: pointer; font-size: 0.9rem; color: var(--text-light); transition: all 0.15s; margin-bottom: 0.15rem; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: #eff6ff; color: var(--primary); font-weight: 600; }
+        .admin-content { flex: 1; min-width: 0; }
 
+        /* QUICK ACTIONS */
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px,1fr)); gap: 1rem; }
+        .action-card { background: var(--bg); border-radius: var(--radius); padding: 1rem; text-align: center; cursor: pointer; transition: all 0.15s; border: 1.5px solid var(--border); }
+        .action-card:hover { border-color: var(--primary); background: #eff6ff; transform: translateY(-2px); }
+        .action-card .icon { font-size: 1.75rem; display: block; margin-bottom: 0.4rem; }
+        .action-card .label { font-size: 0.8rem; font-weight: 600; }
+
+        /* ALERTS */
+        .alert { padding: 0.75rem 1rem; border-radius: 0.5rem; margin-bottom: 1rem; font-size: 0.88rem; }
+        .alert-warning { background: #fef9c3; border: 1px solid #fde047; color: #713f12; }
+        .alert-info { background: #dbeafe; border: 1px solid #bfdbfe; color: #1e40af; }
+
+        /* MODAL */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: 1rem; }
         .modal-overlay.open { display: flex; }
+        .modal { background: white; border-radius: 1rem; padding: 2rem; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.3); }
+        .modal h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 1.25rem; }
+        .modal-actions { display: flex; gap: 0.75rem; justify-content: flex-start; margin-top: 1.25rem; flex-direction: row-reverse; }
 
-        .modal {
-            background: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            max-width: 480px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-        }
+        /* TOAST */
+        #toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-size: 0.9rem; display: none; z-index: 9999; box-shadow: var(--shadow-lg); }
 
-        .modal h3 { font-size: 1.2rem; margin-bottom: 1.5rem; }
-
-        .modal-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 1.5rem;
-            justify-content: flex-end;
-        }
-
-        /* ======== QUICK ACTIONS ======== */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-        }
-
-        .action-card {
-            background: white;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.25rem;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .action-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(37,99,235,0.15);
-            transform: translateY(-2px);
-        }
-
-        .action-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
-        .action-card .label { font-size: 0.875rem; font-weight: 600; color: var(--text); }
-
-        /* ======== ALERT ======== */
-        .alert {
-            padding: 0.875rem 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: flex-start;
-            gap: 0.75rem;
-            font-size: 0.9rem;
-        }
-
-        .alert-warning { background: #fef3c7; border-left: 4px solid var(--warning); color: #92400e; }
-        .alert-info { background: #dbeafe; border-left: 4px solid var(--primary); color: #1e40af; }
-        .alert-success { background: #d1fae5; border-left: 4px solid var(--success); color: #065f46; }
-
-        /* ======== PAGE TITLE ======== */
-        .page-title { margin-bottom: 1.5rem; }
-        .page-title h2 { font-size: 1.5rem; font-weight: 700; }
-        .page-title p { color: var(--text-light); margin-top: 0.25rem; font-size: 0.9rem; }
-
-        /* ======== RESPONSIVE ======== */
-        @media (max-width: 768px) {
-            .navbar-links { display: none; }
-            .sidebar { display: none; }
-            .admin-layout { flex-direction: column; }
-            .main-content { padding: 1rem; }
-        }
-
-        /* ======== SPINNER ======== */
-        .login-loading {
-            display: none;
-            text-align: center;
-            color: var(--primary);
-            font-weight: 500;
-            margin-top: 1rem;
-        }
-
-        /* Page indicator */
-        .demo-banner {
-            background: linear-gradient(90deg, #7c3aed, #2563eb);
-            color: white;
-            text-align: center;
-            padding: 0.4rem;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
+        /* GRID */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        @media(max-width:768px) { .grid-2 { grid-template-columns: 1fr; } .admin-layout { flex-direction: column; } .sidebar { width: 100%; position: static; } }
     </style>
 </head>
 <body>
 
-<!-- ==================== LOGIN SCREEN ==================== -->
+<!-- TOAST -->
+<div id="toast"></div>
+
+<!-- ==================== LOGIN ==================== -->
 <div id="login-screen" class="screen active">
     <div class="login-box">
         <div class="login-logo">
             <span class="icon">📦</span>
             <h1>מערכת ניהול ציוד</h1>
-            <p>Equipment Management System</p>
+            <p>אינדורסקי הפקות</p>
         </div>
-
         <div id="login-error" class="error-msg">שם משתמש או סיסמה שגויים</div>
-
         <div class="form-group">
             <label>שם משתמש</label>
             <input type="text" id="username" placeholder="הכנס שם משתמש" autocomplete="username">
         </div>
-
         <div class="form-group">
             <label>סיסמה</label>
             <input type="password" id="password" placeholder="הכנס סיסמה" autocomplete="current-password">
         </div>
-
         <button class="btn btn-primary" onclick="doLogin()">🔐 כניסה למערכת</button>
-
-        <div class="demo-hint">
-            <p>👤 משתמש: <strong>user</strong> | סיסמה: <strong>1234</strong> <span class="tag">משתמש</span></p>
-            <p style="margin-top:0.5rem">👨‍💼 משתמש: <strong>admin</strong> | סיסמה: <strong>admin123</strong> <span class="tag">מנהל</span></p>
-        </div>
     </div>
 </div>
 
-<!-- ==================== USER DASHBOARD ==================== -->
+<!-- ==================== USER SCREEN ==================== -->
 <div id="user-screen" class="screen">
-    <div class="demo-banner">🎭 מצב Demo — המערכת האמיתית תחובר ל-Database</div>
     <nav class="navbar">
         <div class="navbar-brand">📦 מערכת ניהול ציוד</div>
         <ul class="navbar-links">
-            <li><a class="active" onclick="showUserTab('dashboard')">דשבורד</a></li>
-            <li><a onclick="showUserTab('myequipment')">הציוד שלי</a></li>
-            <li><a onclick="showUserTab('tasks')">משימות</a></li>
-            <li><a onclick="showUserTab('history')">היסטוריה</a></li>
+            <li><a class="active" onclick="showUserTab('dashboard', this)">דשבורד</a></li>
+            <li><a onclick="showUserTab('myequipment', this)">הציוד שלי</a></li>
+            <li><a onclick="showUserTab('tasks', this)">משימות</a></li>
+            <li><a onclick="showUserTab('history', this)">היסטוריה</a></li>
         </ul>
         <div class="navbar-user">
-            <span id="user-name-display">user</span>
+            <span id="user-name-display"></span>
             <div class="avatar" id="user-avatar">U</div>
             <button class="btn btn-ghost btn-sm" onclick="doLogout()">יציאה</button>
         </div>
     </nav>
-
     <div class="main-content">
-        <!-- Dashboard Tab -->
+        <!-- Dashboard -->
         <div id="user-dashboard" class="tab-content active">
             <div class="page-title">
                 <h2>👋 שלום, <span id="user-greeting">שי!</span></h2>
                 <p>הנה סיכום הפעילות שלך</p>
             </div>
-
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">ציוד אצלי</div>
-                        <div class="stat-value" style="color:var(--primary)">3</div>
-                    </div>
-                    <div class="stat-icon">📤</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">משימות פתוחות</div>
-                        <div class="stat-value" style="color:var(--warning)">2</div>
-                    </div>
-                    <div class="stat-icon">📋</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">דוחות נזק</div>
-                        <div class="stat-value" style="color:var(--danger)">1</div>
-                    </div>
-                    <div class="stat-icon">⚠️</div>
-                </div>
-                <div class="stat-card">
-                    <div>
-                        <div class="stat-label">הוחזרו החודש</div>
-                        <div class="stat-value" style="color:var(--success)">5</div>
-                    </div>
-                    <div class="stat-icon">✅</div>
-                </div>
+                <div class="stat-card"><div><div class="stat-label">ציוד אצלי</div><div class="stat-value" style="color:var(--primary)" id="stat-my-equipment">0</div></div><div class="stat-icon">📤</div></div>
+                <div class="stat-card"><div><div class="stat-label">משימות פתוחות</div><div class="stat-value" style="color:var(--warning)" id="stat-open-tasks">0</div></div><div class="stat-icon">📋</div></div>
+                <div class="stat-card"><div><div class="stat-label">דוחות נזק</div><div class="stat-value" style="color:var(--danger)" id="stat-damage">0</div></div><div class="stat-icon">⚠️</div></div>
+                <div class="stat-card"><div><div class="stat-label">הוחזרו החודש</div><div class="stat-value" style="color:var(--success)">5</div></div><div class="stat-icon">✅</div></div>
             </div>
-
             <div class="card">
                 <div class="card-title">🚀 פעולות מהירות</div>
                 <div class="quick-actions">
-                    <div class="action-card" onclick="openModal('checkout-modal')">
-                        <div class="icon">📤</div>
-                        <div class="label">שליחת ציוד</div>
-                    </div>
-                    <div class="action-card" onclick="openModal('checkin-modal')">
-                        <div class="icon">📥</div>
-                        <div class="label">החזרת ציוד</div>
-                    </div>
-                    <div class="action-card" onclick="openModal('damage-modal')">
-                        <div class="icon">⚠️</div>
-                        <div class="label">דיווח נזק</div>
-                    </div>
-                    <div class="action-card" onclick="openModal('task-modal')">
-                        <div class="icon">➕</div>
-                        <div class="label">משימה חדשה</div>
-                    </div>
+                    <div class="action-card" onclick="openModal('checkout-modal')"><span class="icon">📤</span><div class="label">שליחת ציוד</div></div>
+                    <div class="action-card" onclick="openModal('checkin-modal')"><span class="icon">📥</span><div class="label">החזרת ציוד</div></div>
+                    <div class="action-card" onclick="openModal('damage-modal')"><span class="icon">⚠️</span><div class="label">דיווח נזק</div></div>
+                    <div class="action-card" onclick="openModal('task-modal')"><span class="icon">➕</span><div class="label">משימה חדשה</div></div>
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-title">📊 פעילות אחרונה</div>
                 <div class="table-wrap">
                     <table>
                         <thead><tr><th>פעילות</th><th>ציוד</th><th>תאריך</th><th>סטטוס</th></tr></thead>
-                        <tbody>
-                            <tr><td>שליחה</td><td>מיקרופון Shure SM58</td><td>18/03/2026</td><td><span class="badge badge-yellow">אצלי</span></td></tr>
-                            <tr><td>שליחה</td><td>כבל XLR 5מ׳</td><td>17/03/2026</td><td><span class="badge badge-yellow">אצלי</span></td></tr>
-                            <tr><td>קבלה</td><td>מעמד מיקרופון</td><td>15/03/2026</td><td><span class="badge badge-green">הוחזר</span></td></tr>
-                            <tr><td>דיווח נזק</td><td>כבל USB</td><td>14/03/2026</td><td><span class="badge badge-red">ניזוק</span></td></tr>
-                            <tr><td>שליחה</td><td>רמקול JBL נייד</td><td>12/03/2026</td><td><span class="badge badge-yellow">אצלי</span></td></tr>
-                        </tbody>
+                        <tbody id="activity-table"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- My Equipment Tab -->
+        <!-- My Equipment -->
         <div id="user-myequipment" class="tab-content">
-            <div class="page-title">
-                <h2>📦 הציוד שלי</h2>
-                <p>ציוד שנמצא כרגע אצלך</p>
-            </div>
+            <div class="page-title"><h2>📦 הציוד שלי</h2><p>ציוד שנמצא כרגע אצלך</p></div>
             <div class="card">
                 <div class="table-wrap">
                     <table>
                         <thead><tr><th>ציוד</th><th>קטגוריה</th><th>נלקח בתאריך</th><th>תאריך החזרה</th><th>מצב</th><th>פעולות</th></tr></thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>מיקרופון Shure SM58</strong></td>
-                                <td>אודיו</td>
-                                <td>18/03/2026</td>
-                                <td>25/03/2026</td>
-                                <td><span class="badge badge-green">תקין</span></td>
-                                <td><button class="btn btn-success btn-sm" onclick="openModal('checkin-modal')">החזר</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>כבל XLR 5מ׳</strong></td>
-                                <td>כבלים</td>
-                                <td>17/03/2026</td>
-                                <td>20/03/2026</td>
-                                <td><span class="badge badge-red">⚠️ פג תאריך</span></td>
-                                <td><button class="btn btn-success btn-sm" onclick="openModal('checkin-modal')">החזר</button></td>
-                            </tr>
-                            <tr>
-                                <td><strong>רמקול JBL נייד</strong></td>
-                                <td>אודיו</td>
-                                <td>12/03/2026</td>
-                                <td>19/03/2026</td>
-                                <td><span class="badge badge-yellow">לוחץ</span></td>
-                                <td><button class="btn btn-success btn-sm" onclick="openModal('checkin-modal')">החזר</button></td>
-                            </tr>
-                        </tbody>
+                        <tbody id="my-equipment-table"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Tasks Tab -->
+        <!-- Tasks -->
         <div id="user-tasks" class="tab-content">
-            <div class="page-title">
-                <h2>📋 המשימות שלי</h2>
-                <p>משימות פתוחות ומוגמרות</p>
-            </div>
+            <div class="page-title"><h2>📋 המשימות שלי</h2><p>משימות פתוחות ומוגמרות</p></div>
             <div style="margin-bottom:1rem;">
                 <button class="btn btn-primary btn-sm" onclick="openModal('task-modal')">➕ משימה חדשה</button>
             </div>
             <div class="card">
                 <div class="table-wrap">
                     <table>
-                        <thead><tr><th>משימה</th><th>תיאור</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th></tr></thead>
-                        <tbody>
-                            <tr><td><strong>החזרת ציוד לאולם</strong></td><td>להחזיר את כל הציוד לאולם ב׳</td><td>20/03/2026</td><td><span class="badge badge-red">גבוה</span></td><td><span class="badge badge-yellow">פתוח</span></td></tr>
-                            <tr><td><strong>בדיקת רמקולים</strong></td><td>לבדוק שכל הרמקולים עובדים</td><td>22/03/2026</td><td><span class="badge badge-blue">בינוני</span></td><td><span class="badge badge-yellow">פתוח</span></td></tr>
-                            <tr><td><strong>הזמנת כבלים חדשים</strong></td><td>הזמין 5 כבלי XLR חדשים</td><td>15/03/2026</td><td><span class="badge badge-green">נמוך</span></td><td><span class="badge badge-green">הושלם</span></td></tr>
-                        </tbody>
+                        <thead><tr><th>משימה</th><th>תיאור</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+                        <tbody id="tasks-table"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- History Tab -->
+        <!-- History -->
         <div id="user-history" class="tab-content">
-            <div class="page-title">
-                <h2>📈 היסטוריה</h2>
-                <p>כל הפעילויות שלך מהתחלה</p>
-            </div>
+            <div class="page-title"><h2>📈 היסטוריה</h2><p>כל הפעילויות שלך</p></div>
             <div class="card">
                 <div class="table-wrap">
                     <table>
                         <thead><tr><th>פעילות</th><th>ציוד</th><th>תאריך</th><th>פרטים</th></tr></thead>
-                        <tbody>
-                            <tr><td><span class="badge badge-blue">שליחה</span></td><td>מיקרופון Shure SM58</td><td>18/03/2026 09:30</td><td>—</td></tr>
-                            <tr><td><span class="badge badge-blue">שליחה</span></td><td>כבל XLR 5מ׳</td><td>17/03/2026 14:15</td><td>—</td></tr>
-                            <tr><td><span class="badge badge-green">קבלה</span></td><td>מעמד מיקרופון</td><td>15/03/2026 11:00</td><td>מצב: תקין</td></tr>
-                            <tr><td><span class="badge badge-red">נזק</span></td><td>כבל USB</td><td>14/03/2026 16:45</td><td>חוט פנימי שבור</td></tr>
-                            <tr><td><span class="badge badge-blue">שליחה</span></td><td>רמקול JBL נייד</td><td>12/03/2026 08:20</td><td>—</td></tr>
-                            <tr><td><span class="badge badge-green">קבלה</span></td><td>מעמד מיקרופון</td><td>10/03/2026 17:30</td><td>מצב: תקין</td></tr>
-                        </tbody>
+                        <tbody id="history-table"></tbody>
                     </table>
                 </div>
             </div>
@@ -666,251 +262,130 @@
     </div>
 </div>
 
-<!-- ==================== ADMIN DASHBOARD ==================== -->
+<!-- ==================== ADMIN SCREEN ==================== -->
 <div id="admin-screen" class="screen">
-    <div class="demo-banner">🎭 מצב Demo — המערכת האמיתית תחובר ל-Database</div>
     <nav class="navbar">
-        <div class="navbar-brand">👨‍💼 פאנל ניהול</div>
-        <ul class="navbar-links">
-            <li><a href="#" onclick="showScreen('user-screen'); return false;" style="color:var(--text-light)">← חזור לדשבורד</a></li>
-        </ul>
+        <div class="navbar-brand">👨‍💼 פאנל ניהול — אינדורסקי הפקות</div>
         <div class="navbar-user">
             <span class="admin-badge">מנהל</span>
             <div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#be185d)">A</div>
             <button class="btn btn-ghost btn-sm" onclick="doLogout()">יציאה</button>
         </div>
     </nav>
-
     <div class="main-content">
         <div class="admin-layout">
-            <!-- Sidebar -->
             <aside class="sidebar">
                 <h4>תפריט</h4>
                 <ul class="sidebar-menu">
-                    <li><a class="active" onclick="showAdminTab('admin-overview')">📊 סקירה כללית</a></li>
-                    <li><a onclick="showAdminTab('admin-equipment')">📦 ניהול ציוד</a></li>
-                    <li><a onclick="showAdminTab('admin-users')">👥 ניהול משתמשים</a></li>
-                    <li><a onclick="showAdminTab('admin-damage')">⚠️ דוחות נזק</a></li>
-                    <li><a onclick="showAdminTab('admin-inventory')">📊 מלאי</a></li>
-                    <li><a onclick="showAdminTab('admin-reports')">📈 דוחות</a></li>
+                    <li><a class="active" onclick="showAdminTab('admin-overview', this)">📊 סקירה כללית</a></li>
+                    <li><a onclick="showAdminTab('admin-equipment', this)">📦 ניהול ציוד</a></li>
+                    <li><a onclick="showAdminTab('admin-users', this)">👥 ניהול משתמשים</a></li>
+                    <li><a onclick="showAdminTab('admin-damage', this)">⚠️ דוחות נזק</a></li>
+                    <li><a onclick="showAdminTab('admin-inventory', this)">📊 מלאי</a></li>
+                    <li><a onclick="showAdminTab('admin-reports', this)">📈 דוחות</a></li>
                 </ul>
             </aside>
-
-            <!-- Admin Content -->
             <div class="admin-content">
 
-                <!-- Overview Tab -->
+                <!-- Overview -->
                 <div id="admin-overview" class="tab-content active">
-                    <div class="page-title">
-                        <h2>📊 סקירה כללית</h2>
-                        <p>סטטוס המערכת בזמן אמת</p>
-                    </div>
-
+                    <div class="page-title"><h2>📊 סקירה כללית</h2><p>סטטוס המערכת בזמן אמת</p></div>
                     <div class="stats-grid">
-                        <div class="stat-card"><div><div class="stat-label">סה"כ ציוד</div><div class="stat-value" style="color:var(--primary)">45</div></div><div class="stat-icon">📦</div></div>
-                        <div class="stat-card"><div><div class="stat-label">ציוד זמין</div><div class="stat-value" style="color:var(--success)">28</div></div><div class="stat-icon">✅</div></div>
-                        <div class="stat-card"><div><div class="stat-label">בשימוש</div><div class="stat-value" style="color:var(--warning)">14</div></div><div class="stat-icon">📤</div></div>
-                        <div class="stat-card"><div><div class="stat-label">ניזוק/בתיקון</div><div class="stat-value" style="color:var(--danger)">3</div></div><div class="stat-icon">🔧</div></div>
-                        <div class="stat-card"><div><div class="stat-label">משתמשים פעילים</div><div class="stat-value" style="color:var(--primary)">12</div></div><div class="stat-icon">👥</div></div>
-                        <div class="stat-card"><div><div class="stat-label">פעולות היום</div><div class="stat-value" style="color:var(--success)">8</div></div><div class="stat-icon">⚡</div></div>
+                        <div class="stat-card"><div><div class="stat-label">סה"כ ציוד</div><div class="stat-value" style="color:var(--primary)" id="ov-total">0</div></div><div class="stat-icon">📦</div></div>
+                        <div class="stat-card"><div><div class="stat-label">זמין</div><div class="stat-value" style="color:var(--success)" id="ov-available">0</div></div><div class="stat-icon">✅</div></div>
+                        <div class="stat-card"><div><div class="stat-label">בשימוש</div><div class="stat-value" style="color:var(--warning)" id="ov-inuse">0</div></div><div class="stat-icon">📤</div></div>
+                        <div class="stat-card"><div><div class="stat-label">ניזוק/בתיקון</div><div class="stat-value" style="color:var(--danger)" id="ov-damaged">0</div></div><div class="stat-icon">🔧</div></div>
+                        <div class="stat-card"><div><div class="stat-label">משתמשים פעילים</div><div class="stat-value" style="color:var(--primary)" id="ov-users">0</div></div><div class="stat-icon">👥</div></div>
+                        <div class="stat-card"><div><div class="stat-label">דוחות נזק פתוחים</div><div class="stat-value" style="color:var(--danger)" id="ov-open-damage">0</div></div><div class="stat-icon">⚠️</div></div>
                     </div>
-
                     <div class="card">
-                        <div class="card-title">📋 פעילויות אחרונות במערכת</div>
+                        <div class="card-title">📋 פעילויות אחרונות</div>
                         <div class="table-wrap">
                             <table>
                                 <thead><tr><th>משתמש</th><th>פעולה</th><th>ציוד</th><th>זמן</th></tr></thead>
-                                <tbody>
-                                    <tr><td>שי בר</td><td><span class="badge badge-blue">שליחה</span></td><td>מיקרופון Shure SM58</td><td>היום 09:30</td></tr>
-                                    <tr><td>דויד כהן</td><td><span class="badge badge-green">קבלה</span></td><td>מעמד מיקרופון</td><td>היום 08:15</td></tr>
-                                    <tr><td>שרה דוד</td><td><span class="badge badge-red">נזק</span></td><td>כבל USB</td><td>אתמול 16:45</td></tr>
-                                    <tr><td>יוסי לוי</td><td><span class="badge badge-blue">שליחה</span></td><td>רמקול JBL נייד</td><td>אתמול 10:20</td></tr>
-                                </tbody>
+                                <tbody id="admin-activity-table"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Equipment Tab -->
+                <!-- Equipment Management -->
                 <div id="admin-equipment" class="tab-content">
-                    <div class="page-title">
-                        <h2>📦 ניהול ציוד</h2>
-                        <p>הוסף, ערוך ונהל את כל הציוד במערכת</p>
-                    </div>
-
-                    <div class="alert alert-warning">⚠️ <strong>שטח מנהל בלבד:</strong> רק מנהלים יכולים להוסיף, לערוך ולמחוק ציוד.</div>
-
+                    <div class="page-title"><h2>📦 ניהול ציוד</h2><p>הוסף, ערוך ונהל את כל הציוד</p></div>
                     <div style="margin-bottom:1rem; display:flex; gap:0.75rem; flex-wrap:wrap;">
                         <button class="btn btn-primary btn-sm" onclick="openModal('add-equipment-modal')">➕ הוסף ציוד</button>
-                        <button class="btn btn-ghost btn-sm">📥 ייבוא CSV</button>
-                        <button class="btn btn-ghost btn-sm">📤 ייצוא</button>
+                        <button class="btn btn-ghost btn-sm" onclick="importCSV()">📥 ייבוא CSV</button>
+                        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📤 ייצוא CSV</button>
+                        <input type="file" id="csv-file-input" accept=".csv" style="display:none" onchange="handleCSV(this)">
                     </div>
-
                     <div class="card">
                         <div class="table-wrap">
                             <table>
                                 <thead><tr><th>שם הציוד</th><th>קטגוריה</th><th>S/N</th><th>סטטוס</th><th>נמצא אצל</th><th>פעולות</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>מיקרופון Shure SM58</strong></td><td>אודיו</td><td>MIC-001</td>
-                                        <td><span class="badge badge-yellow">בשימוש</span></td><td>שי בר</td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>מעמד מיקרופון</strong></td><td>תמיכה</td><td>STAND-001</td>
-                                        <td><span class="badge badge-green">זמין</span></td><td>—</td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>כבל USB</strong></td><td>כבלים</td><td>CABLE-001</td>
-                                        <td><span class="badge badge-red">ניזוק</span></td><td>—</td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>רמקול JBL נייד</strong></td><td>אודיו</td><td>SPEAKER-001</td>
-                                        <td><span class="badge badge-yellow">בשימוש</span></td><td>שי בר</td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>כבל XLR 5מ׳</strong></td><td>כבלים</td><td>XLR-001</td>
-                                        <td><span class="badge badge-yellow">בשימוש</span></td><td>שי בר</td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="admin-equipment-table"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Users Tab -->
+                <!-- Users Management -->
                 <div id="admin-users" class="tab-content">
-                    <div class="page-title">
-                        <h2>👥 ניהול משתמשים</h2>
-                        <p>נהל הרשאות, סטטוסים ומידע על משתמשים</p>
-                    </div>
-
-                    <div class="alert alert-warning">⚠️ <strong>שטח מנהל בלבד:</strong> רק מנהלים יכולים ליצור ולמחוק משתמשים.</div>
-
+                    <div class="page-title"><h2>👥 ניהול משתמשים</h2><p>נהל הרשאות וסטטוסים</p></div>
                     <div style="margin-bottom:1rem;">
                         <button class="btn btn-primary btn-sm" onclick="openModal('add-user-modal')">➕ הוסף משתמש</button>
                     </div>
-
                     <div class="card">
                         <div class="table-wrap">
                             <table>
-                                <thead><tr><th>משתמש</th><th>שם מלא</th><th>דוא"ל</th><th>תפקיד</th><th>ציוד אצלו</th><th>פעיל</th><th>פעולות</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>admin</strong></td><td>מנהל מערכת</td><td>admin@system.com</td>
-                                        <td><span class="badge badge-purple">מנהל</span></td><td>0</td>
-                                        <td><span class="badge badge-green">✓</span></td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>user</strong></td><td>שי בר</td><td>user@system.com</td>
-                                        <td><span class="badge badge-blue">משתמש</span></td><td>3</td>
-                                        <td><span class="badge badge-green">✓</span></td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🚫 השבת</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>david</strong></td><td>דויד כהן</td><td>david@system.com</td>
-                                        <td><span class="badge badge-blue">משתמש</span></td><td>1</td>
-                                        <td><span class="badge badge-green">✓</span></td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🚫 השבת</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>sarah</strong></td><td>שרה דוד</td><td>sarah@system.com</td>
-                                        <td><span class="badge badge-blue">משתמש</span></td><td>0</td>
-                                        <td><span class="badge badge-red">✗ מושבת</span></td>
-                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-success btn-sm">✓ הפעל</button></td>
-                                    </tr>
-                                </tbody>
+                                <thead><tr><th>משתמש</th><th>שם מלא</th><th>תפקיד</th><th>ציוד אצלו</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+                                <tbody id="admin-users-table"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Damage Tab -->
+                <!-- Damage Reports -->
                 <div id="admin-damage" class="tab-content">
-                    <div class="page-title">
-                        <h2>⚠️ דוחות נזק</h2>
-                        <p>נהל דוחות נזק ועדכן סטטוס תיקון</p>
-                    </div>
-                    <div class="alert alert-warning">⚠️ <strong>שטח מנהל בלבד:</strong> רק מנהלים יכולים לעדכן סטטוסי תיקון.</div>
+                    <div class="page-title"><h2>⚠️ דוחות נזק</h2><p>נהל דוחות ועדכן סטטוס תיקון</p></div>
                     <div class="card">
                         <div class="table-wrap">
                             <table>
-                                <thead><tr><th>ציוד</th><th>מדווח ע"י</th><th>תיאור</th><th>חומרה</th><th>סטטוס</th><th>פעולות מנהל</th></tr></thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>כבל USB</strong></td><td>שי בר</td><td>חוט פנימי שבור</td>
-                                        <td><span class="badge badge-red">חמור</span></td>
-                                        <td><span class="badge badge-yellow">בתיקון</span></td>
-                                        <td>
-                                            <button class="btn btn-success btn-sm">✓ תוקן</button>
-                                            <button class="btn btn-danger btn-sm">🗑️ גרוט</button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>מעמד מיקרופון</strong></td><td>דויד כהן</td><td>שריטה בחלק העליון</td>
-                                        <td><span class="badge badge-blue">קל</span></td>
-                                        <td><span class="badge badge-green">תוקן</span></td>
-                                        <td><button class="btn btn-ghost btn-sm">📄 פרטים</button></td>
-                                    </tr>
-                                </tbody>
+                                <thead><tr><th>ציוד</th><th>מדווח ע"י</th><th>תיאור</th><th>חומרה</th><th>סטטוס</th><th>פעולות</th></tr></thead>
+                                <tbody id="admin-damage-table"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Inventory Tab -->
+                <!-- Inventory -->
                 <div id="admin-inventory" class="tab-content">
-                    <div class="page-title">
-                        <h2>📊 ניהול מלאי</h2>
-                        <p>סקירה מלאה של כל הציוד לפי קטגוריה</p>
-                    </div>
-                    <div class="alert alert-info">ℹ️ <strong>שטח מנהל בלבד:</strong> דוח מלאי מלא ומפורט.</div>
+                    <div class="page-title"><h2>📊 ניהול מלאי</h2><p>סקירה מלאה לפי קטגוריה</p></div>
                     <div class="card">
                         <div class="table-wrap">
                             <table>
-                                <thead><tr><th>קטגוריה</th><th>סה"כ</th><th>זמין</th><th>בשימוש</th><th>ניזוק</th><th>בתיקון</th><th>%ניצולת</th></tr></thead>
-                                <tbody>
-                                    <tr><td><strong>אודיו</strong></td><td>15</td><td>10</td><td>4</td><td>1</td><td>0</td><td><span class="badge badge-green">73%</span></td></tr>
-                                    <tr><td><strong>כבלים</strong></td><td>20</td><td>15</td><td>4</td><td>1</td><td>0</td><td><span class="badge badge-yellow">80%</span></td></tr>
-                                    <tr><td><strong>תמיכה</strong></td><td>8</td><td>2</td><td>6</td><td>0</td><td>0</td><td><span class="badge badge-red">25%</span></td></tr>
-                                    <tr><td><strong>אחר</strong></td><td>2</td><td>1</td><td>0</td><td>1</td><td>0</td><td><span class="badge badge-blue">50%</span></td></tr>
-                                    <tr style="font-weight:600; background:var(--bg)"><td>סה"כ</td><td>45</td><td>28</td><td>14</td><td>3</td><td>0</td><td><span class="badge badge-yellow">62%</span></td></tr>
-                                </tbody>
+                                <thead><tr><th>קטגוריה</th><th>סה"כ</th><th>זמין</th><th>בשימוש</th><th>ניזוק</th><th>%ניצולת</th></tr></thead>
+                                <tbody id="admin-inventory-table"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
 
-                <!-- Reports Tab -->
+                <!-- Reports -->
                 <div id="admin-reports" class="tab-content">
-                    <div class="page-title">
-                        <h2>📈 דוחות</h2>
-                        <p>ניתוח נתונים ומגמות</p>
-                    </div>
-                    <div class="alert alert-info">ℹ️ <strong>שטח מנהל בלבד:</strong> דוחות מפורטים על פעילות המערכת.</div>
+                    <div class="page-title"><h2>📈 דוחות</h2><p>ניתוח נתונים ומגמות</p></div>
                     <div class="grid-2">
                         <div class="card">
                             <div class="card-title">📅 פעילות חודש מרץ 2026</div>
                             <table><tbody>
-                                <tr><td>שליחות</td><td><strong>45</strong></td></tr>
-                                <tr><td>קבלות</td><td><strong>40</strong></td></tr>
-                                <tr><td>דוחות נזק</td><td><strong>3</strong></td></tr>
-                                <tr><td>ציוד חדש נוסף</td><td><strong>2</strong></td></tr>
+                                <tr><td>שליחות</td><td><strong id="rep-checkouts">0</strong></td></tr>
+                                <tr><td>קבלות</td><td><strong id="rep-checkins">0</strong></td></tr>
+                                <tr><td>דוחות נזק</td><td><strong id="rep-damages">0</strong></td></tr>
+                                <tr><td>ציוד שנוסף</td><td><strong id="rep-added">0</strong></td></tr>
                             </tbody></table>
                         </div>
                         <div class="card">
                             <div class="card-title">👥 משתמשים פעילים</div>
-                            <table><tbody>
-                                <tr><td>שי בר</td><td><strong>15 פעולות</strong></td></tr>
-                                <tr><td>דויד כהן</td><td><strong>12 פעולות</strong></td></tr>
-                                <tr><td>שרה דוד</td><td><strong>8 פעולות</strong></td></tr>
-                                <tr><td>יוסי לוי</td><td><strong>5 פעולות</strong></td></tr>
-                            </tbody></table>
+                            <table><tbody id="rep-users-table"></tbody></table>
                         </div>
                     </div>
                 </div>
@@ -922,59 +397,23 @@
 
 <!-- ==================== MODALS ==================== -->
 
-<!-- Checkout Modal -->
-<div id="checkout-modal" class="modal-overlay">
+<!-- Edit Equipment Modal -->
+<div id="edit-equipment-modal" class="modal-overlay">
     <div class="modal">
-        <h3>📤 שליחת ציוד</h3>
-        <div class="form-group"><label>בחר ציוד</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>מעמד מיקרופון</option><option>כבל XLR 5מ׳</option><option>רמקול JBL קטן</option></select></div>
-        <div class="form-group"><label>תאריך החזרה</label><input type="date" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label>הערות</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="הערות אופציונליות..."></textarea></div>
-        <div class="modal-actions">
-            <button class="btn btn-ghost" onclick="closeModal('checkout-modal')">ביטול</button>
-            <button class="btn btn-primary" onclick="showSuccess('הציוד נשלח בהצלחה!'); closeModal('checkout-modal')">📤 שלח ציוד</button>
+        <h3>✏️ עריכת ציוד</h3>
+        <input type="hidden" id="edit-eq-id">
+        <div class="form-group"><label>שם הציוד</label><input type="text" id="edit-eq-name" style="width:100%"></div>
+        <div class="form-group"><label>קטגוריה</label>
+            <select id="edit-eq-cat" style="width:100%"><option>אודיו</option><option>תמיכה</option><option>כבלים</option><option>תאורה</option><option>וידאו</option><option>אחר</option></select>
         </div>
-    </div>
-</div>
-
-<!-- Checkin Modal -->
-<div id="checkin-modal" class="modal-overlay">
-    <div class="modal">
-        <h3>📥 החזרת ציוד</h3>
-        <div class="form-group"><label>בחר ציוד להחזרה</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>מיקרופון Shure SM58</option><option>כבל XLR 5מ׳</option><option>רמקול JBL נייד</option></select></div>
-        <div class="form-group"><label>מצב הציוד</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>תקין</option><option>סביר</option><option>ניזוק</option></select></div>
-        <div class="form-group"><label>הערות</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="תאר את מצב הציוד..."></textarea></div>
-        <div class="modal-actions">
-            <button class="btn btn-ghost" onclick="closeModal('checkin-modal')">ביטול</button>
-            <button class="btn btn-success" onclick="showSuccess('הציוד הוחזר בהצלחה!'); closeModal('checkin-modal')">📥 החזר ציוד</button>
+        <div class="form-group"><label>Serial Number</label><input type="text" id="edit-eq-sn" style="width:100%"></div>
+        <div class="form-group"><label>סטטוס</label>
+            <select id="edit-eq-status" style="width:100%"><option value="זמין">זמין</option><option value="בשימוש">בשימוש</option><option value="ניזוק">ניזוק</option><option value="בתיקון">בתיקון</option></select>
         </div>
-    </div>
-</div>
-
-<!-- Damage Modal -->
-<div id="damage-modal" class="modal-overlay">
-    <div class="modal">
-        <h3>⚠️ דיווח נזק</h3>
-        <div class="form-group"><label>בחר ציוד</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>מיקרופון Shure SM58</option><option>כבל XLR 5מ׳</option><option>רמקול JBL נייד</option></select></div>
-        <div class="form-group"><label>תיאור הנזק</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="תאר את הנזק בפירוט..."></textarea></div>
-        <div class="form-group"><label>חומרת הנזק</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>קל</option><option>בינוני</option><option>חמור</option></select></div>
+        <div class="form-group"><label>תיאור</label><textarea id="edit-eq-desc" style="width:100%"></textarea></div>
         <div class="modal-actions">
-            <button class="btn btn-ghost" onclick="closeModal('damage-modal')">ביטול</button>
-            <button class="btn btn-danger" onclick="showSuccess('דוח הנזק נשלח למנהל!'); closeModal('damage-modal')">⚠️ שלח דוח</button>
-        </div>
-    </div>
-</div>
-
-<!-- Task Modal -->
-<div id="task-modal" class="modal-overlay">
-    <div class="modal">
-        <h3>➕ משימה חדשה</h3>
-        <div class="form-group"><label>כותרת</label><input type="text" placeholder="כותרת המשימה..." style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label>תיאור</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="תאר את המשימה..."></textarea></div>
-        <div class="form-group"><label>עדיפות</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>גבוה</option><option>בינוני</option><option>נמוך</option></select></div>
-        <div class="form-group"><label>תאריך יעד</label><input type="date" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="modal-actions">
-            <button class="btn btn-ghost" onclick="closeModal('task-modal')">ביטול</button>
-            <button class="btn btn-primary" onclick="showSuccess('המשימה נוצרה בהצלחה!'); closeModal('task-modal')">✅ צור משימה</button>
+            <button class="btn btn-ghost" onclick="closeModal('edit-equipment-modal')">ביטול</button>
+            <button class="btn btn-primary" style="width:auto" onclick="saveEditEquipment()">💾 שמור שינויים</button>
         </div>
     </div>
 </div>
@@ -983,13 +422,15 @@
 <div id="add-equipment-modal" class="modal-overlay">
     <div class="modal">
         <h3>📦 הוסף ציוד חדש</h3>
-        <div class="form-group"><label>שם הציוד</label><input type="text" placeholder="למ' מיקרופון Shure SM58" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label>קטגוריה</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>אודיו</option><option>תמיכה</option><option>כבלים</option><option>אחר</option></select></div>
-        <div class="form-group"><label>Serial Number</label><input type="text" placeholder="MIC-001" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label>תיאור</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px"></textarea></div>
+        <div class="form-group"><label>שם הציוד</label><input type="text" id="new-eq-name" placeholder="לדוג׳ מיקרופון Shure SM58" style="width:100%"></div>
+        <div class="form-group"><label>קטגוריה</label>
+            <select id="new-eq-cat" style="width:100%"><option>אודיו</option><option>תמיכה</option><option>כבלים</option><option>תאורה</option><option>וידאו</option><option>אחר</option></select>
+        </div>
+        <div class="form-group"><label>Serial Number</label><input type="text" id="new-eq-sn" placeholder="MIC-001" style="width:100%"></div>
+        <div class="form-group"><label>תיאור</label><textarea id="new-eq-desc" style="width:100%" placeholder="תיאור אופציונלי..."></textarea></div>
         <div class="modal-actions">
             <button class="btn btn-ghost" onclick="closeModal('add-equipment-modal')">ביטול</button>
-            <button class="btn btn-primary" onclick="showSuccess('הציוד נוסף למערכת!'); closeModal('add-equipment-modal')">➕ הוסף ציוד</button>
+            <button class="btn btn-primary" style="width:auto" onclick="addEquipment()">➕ הוסף ציוד</button>
         </div>
     </div>
 </div>
@@ -998,107 +439,714 @@
 <div id="add-user-modal" class="modal-overlay">
     <div class="modal">
         <h3>👤 הוסף משתמש חדש</h3>
-        <div class="form-group"><label>שם משתמש</label><input type="text" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label>שם מלא</label><input type="text" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label>דוא"ל</label><input type="email" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label>סיסמה</label><input type="password" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
-        <div class="form-group"><label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer"><input type="checkbox"> הנפק כמנהל מערכת</label></div>
+        <div class="form-group"><label>שם משתמש</label><input type="text" id="new-user-username" placeholder="username" style="width:100%"></div>
+        <div class="form-group"><label>שם מלא</label><input type="text" id="new-user-fullname" placeholder="שם מלא" style="width:100%"></div>
+        <div class="form-group"><label>סיסמה</label><input type="password" id="new-user-password" placeholder="סיסמה" style="width:100%"></div>
+        <div class="form-group"><label>תפקיד</label>
+            <select id="new-user-role" style="width:100%"><option value="false">משתמש</option><option value="true">מנהל</option></select>
+        </div>
         <div class="modal-actions">
             <button class="btn btn-ghost" onclick="closeModal('add-user-modal')">ביטול</button>
-            <button class="btn btn-primary" onclick="showSuccess('המשתמש נוצר בהצלחה!'); closeModal('add-user-modal')">➕ צור משתמש</button>
+            <button class="btn btn-primary" style="width:auto" onclick="addUser()">➕ הוסף משתמש</button>
         </div>
     </div>
 </div>
 
-<!-- Success Toast -->
-<div id="toast" style="position:fixed;bottom:2rem;right:2rem;background:#065f46;color:white;padding:1rem 1.5rem;border-radius:0.75rem;box-shadow:var(--shadow-lg);font-weight:500;display:none;z-index:999;animation:slideIn 0.3s ease">
-    ✅ <span id="toast-msg"></span>
+<!-- Checkout Modal -->
+<div id="checkout-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>📤 שליחת ציוד</h3>
+        <div class="form-group"><label>בחר ציוד</label><select id="checkout-item" style="width:100%"></select></div>
+        <div class="form-group"><label>תאריך החזרה</label><input type="date" id="checkout-date" style="width:100%"></div>
+        <div class="form-group"><label>הערות</label><textarea id="checkout-notes" placeholder="הערות אופציונליות..." style="width:100%"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('checkout-modal')">ביטול</button>
+            <button class="btn btn-primary" style="width:auto" onclick="doCheckout()">📤 שלח ציוד</button>
+        </div>
+    </div>
 </div>
 
-<style>
-@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-</style>
+<!-- Checkin Modal -->
+<div id="checkin-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>📥 החזרת ציוד</h3>
+        <div class="form-group"><label>בחר ציוד להחזרה</label><select id="checkin-item" style="width:100%"></select></div>
+        <div class="form-group"><label>מצב הציוד</label>
+            <select id="checkin-condition" style="width:100%"><option>תקין</option><option>סביר</option><option>ניזוק</option></select>
+        </div>
+        <div class="form-group"><label>הערות</label><textarea id="checkin-notes" placeholder="תאר את מצב הציוד..." style="width:100%"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('checkin-modal')">ביטול</button>
+            <button class="btn btn-success" onclick="doCheckin()">📥 החזר ציוד</button>
+        </div>
+    </div>
+</div>
+
+<!-- Damage Modal -->
+<div id="damage-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>⚠️ דיווח נזק</h3>
+        <div class="form-group"><label>בחר ציוד</label><select id="damage-item" style="width:100%"></select></div>
+        <div class="form-group"><label>תיאור הנזק</label><textarea id="damage-desc" placeholder="תאר את הנזק בפירוט..." style="width:100%"></textarea></div>
+        <div class="form-group"><label>חומרת הנזק</label>
+            <select id="damage-severity" style="width:100%"><option>קל</option><option>בינוני</option><option>חמור</option></select>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('damage-modal')">ביטול</button>
+            <button class="btn btn-danger" onclick="doDamageReport()">⚠️ שלח דוח</button>
+        </div>
+    </div>
+</div>
+
+<!-- Task Modal -->
+<div id="task-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>➕ משימה חדשה</h3>
+        <div class="form-group"><label>כותרת</label><input type="text" id="task-title" placeholder="כותרת המשימה..." style="width:100%"></div>
+        <div class="form-group"><label>תיאור</label><textarea id="task-desc" placeholder="תאר את המשימה..." style="width:100%"></textarea></div>
+        <div class="form-group"><label>עדיפות</label>
+            <select id="task-priority" style="width:100%"><option>גבוה</option><option>בינוני</option><option>נמוך</option></select>
+        </div>
+        <div class="form-group"><label>תאריך יעד</label><input type="date" id="task-date" style="width:100%"></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('task-modal')">ביטול</button>
+            <button class="btn btn-primary" style="width:auto" onclick="addTask()">✅ צור משימה</button>
+        </div>
+    </div>
+</div>
+
+<!-- Damage Details Modal -->
+<div id="damage-details-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>📄 פרטי דוח נזק</h3>
+        <div id="damage-details-content"></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('damage-details-modal')">סגור</button>
+        </div>
+    </div>
+</div>
 
 <script>
-    const USERS = {
-        'admin': { password: 'admin123', isAdmin: true, fullName: 'מנהל מערכת' },
-        'user': { password: '1234', isAdmin: false, fullName: 'שי בר' }
-    };
+// ===================== DATA =====================
+const USERS = [
+    { id: 1, username: 'admin', password: 'admin123', isAdmin: true,  fullName: 'מנהל מערכת', active: true },
+    { id: 2, username: 'user',  password: '1234',     isAdmin: false, fullName: 'שי בר',       active: true },
+    { id: 3, username: 'david', password: 'david123', isAdmin: false, fullName: 'דויד כהן',    active: true },
+    { id: 4, username: 'sarah', password: 'sarah123', isAdmin: false, fullName: 'שרה דוד',     active: false },
+];
 
-    let currentUser = null;
+let equipment = [
+    { id: 1, name: 'מיקרופון Shure SM58', category: 'אודיו',  sn: 'MIC-001',     status: 'בשימוש', holder: 'שי בר',    desc: '' },
+    { id: 2, name: 'מעמד מיקרופון',       category: 'תמיכה', sn: 'STAND-001',   status: 'זמין',   holder: '',         desc: '' },
+    { id: 3, name: 'כבל USB',             category: 'כבלים', sn: 'CABLE-001',   status: 'ניזוק',  holder: '',         desc: '' },
+    { id: 4, name: 'רמקול JBL נייד',      category: 'אודיו',  sn: 'SPEAKER-001', status: 'בשימוש', holder: 'שי בר',    desc: '' },
+    { id: 5, name: 'כבל XLR 5מ׳',         category: 'כבלים', sn: 'XLR-001',     status: 'בשימוש', holder: 'שי בר',    desc: '' },
+    { id: 6, name: 'רמקול JBL קטן',       category: 'אודיו',  sn: 'SPEAKER-002', status: 'זמין',   holder: '',         desc: '' },
+];
 
-    function doLogin() {
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value;
-        const errorEl = document.getElementById('login-error');
+let damageReports = [
+    { id: 1, equipmentName: 'כבל USB',        reportedBy: 'שי בר',    desc: 'חוט פנימי שבור',      severity: 'חמור', status: 'בתיקון', date: '14/03/2026' },
+    { id: 2, equipmentName: 'מעמד מיקרופון',  reportedBy: 'דויד כהן', desc: 'שריטה בחלק העליון',    severity: 'קל',   status: 'תוקן',   date: '10/03/2026' },
+];
 
-        errorEl.style.display = 'none';
+let tasks = [
+    { id: 1, title: 'החזרת ציוד לאולם',  desc: 'להחזיר את כל הציוד לאולם ב׳', date: '20/03/2026', priority: 'גבוה',  status: 'פתוח'   },
+    { id: 2, title: 'בדיקת רמקולים',      desc: 'לבדוק שכל הרמקולים עובדים',   date: '22/03/2026', priority: 'בינוני', status: 'פתוח'   },
+    { id: 3, title: 'הזמנת כבלים חדשים',  desc: 'הזמין 5 כבלי XLR חדשים',      date: '15/03/2026', priority: 'נמוך',  status: 'הושלם'  },
+];
 
-        const user = USERS[username];
-        if (!user || user.password !== password) {
-            errorEl.style.display = 'block';
-            return;
-        }
+let history = [
+    { type: 'שליחה', equipment: 'מיקרופון Shure SM58', date: '18/03/2026 09:30', detail: '—' },
+    { type: 'שליחה', equipment: 'כבל XLR 5מ׳',         date: '17/03/2026 14:15', detail: '—' },
+    { type: 'קבלה',  equipment: 'מעמד מיקרופון',       date: '15/03/2026 11:00', detail: 'מצב: תקין' },
+    { type: 'נזק',   equipment: 'כבל USB',              date: '14/03/2026 16:45', detail: 'חוט פנימי שבור' },
+    { type: 'שליחה', equipment: 'רמקול JBL נייד',      date: '12/03/2026 08:20', detail: '—' },
+];
 
-        currentUser = { username, ...user };
+let nextEqId = 10;
+let nextTaskId = 10;
+let nextDamageId = 10;
+let currentUser = null;
 
-        if (user.isAdmin) {
-            showScreen('admin-screen');
-        } else {
-            document.getElementById('user-name-display').textContent = username;
-            document.getElementById('user-avatar').textContent = username[0].toUpperCase();
-            document.getElementById('user-greeting').textContent = user.fullName + '!';
-            showScreen('user-screen');
-        }
+// ===================== AUTH =====================
+function doLogin() {
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value;
+    const user = USERS.find(x => x.username === u && x.password === p);
+    const err = document.getElementById('login-error');
+    if (!user) { err.classList.add('show'); return; }
+    err.classList.remove('show');
+    currentUser = user;
+    if (user.isAdmin) {
+        showScreen('admin-screen');
+        renderAdminAll();
+    } else {
+        document.getElementById('user-name-display').textContent = user.fullName;
+        document.getElementById('user-avatar').textContent = user.fullName[0];
+        document.getElementById('user-greeting').textContent = user.fullName.split(' ')[0] + '!';
+        showScreen('user-screen');
+        renderUserAll();
     }
+}
 
-    function doLogout() {
-        currentUser = null;
-        document.getElementById('username').value = '';
-        document.getElementById('password').value = '';
-        showScreen('login-screen');
-    }
+function doLogout() {
+    currentUser = null;
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    showScreen('login-screen');
+}
 
-    function showScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    }
+// ===================== NAVIGATION =====================
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
 
-    function showUserTab(tabName) {
-        document.querySelectorAll('#user-screen .tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById('user-' + tabName).classList.add('active');
-        document.querySelectorAll('#user-screen .navbar-links a').forEach(a => a.classList.remove('active'));
-        event.target.classList.add('active');
-    }
+function showUserTab(tab, el) {
+    document.querySelectorAll('#user-screen .tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById('user-' + tab).classList.add('active');
+    document.querySelectorAll('#user-screen .navbar-links a').forEach(a => a.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
 
-    function showAdminTab(tabId) {
-        document.querySelectorAll('#admin-screen .tab-content').forEach(t => t.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
-        event.target.classList.add('active');
-    }
+function showAdminTab(tab, el) {
+    document.querySelectorAll('#admin-screen .tab-content').forEach(t => t.classList.remove('active'));
+    document.getElementById(tab).classList.add('active');
+    document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+    if (el) el.classList.add('active');
+}
 
-    function openModal(id) { document.getElementById(id).classList.add('open'); }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+// ===================== MODALS =====================
+function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    if (id === 'checkout-modal') populateCheckoutSelect();
+    if (id === 'checkin-modal')  populateCheckinSelect();
+    if (id === 'damage-modal')   populateDamageSelect();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    // Close modal on overlay click
-    document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', function(e) {
-            if (e.target === this) this.classList.remove('open');
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
+});
+
+// ===================== TOAST =====================
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+}
+
+// ===================== HELPERS =====================
+function statusBadge(s) {
+    const map = { 'זמין': 'badge-green', 'בשימוש': 'badge-yellow', 'ניזוק': 'badge-red', 'בתיקון': 'badge-yellow' };
+    return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+function priorityBadge(p) {
+    const map = { 'גבוה': 'badge-red', 'בינוני': 'badge-blue', 'נמוך': 'badge-green' };
+    return `<span class="badge ${map[p]||'badge-gray'}">${p}</span>`;
+}
+function taskStatusBadge(s) {
+    return s === 'הושלם' ? `<span class="badge badge-green">${s}</span>` : `<span class="badge badge-yellow">${s}</span>`;
+}
+function historyBadge(t) {
+    const map = { 'שליחה': 'badge-blue', 'קבלה': 'badge-green', 'נזק': 'badge-red' };
+    return `<span class="badge ${map[t]||'badge-gray'}">${t}</span>`;
+}
+function severityBadge(s) {
+    const map = { 'קל': 'badge-blue', 'בינוני': 'badge-yellow', 'חמור': 'badge-red' };
+    return `<span class="badge ${map[s]||'badge-gray'}">${s}</span>`;
+}
+function today() {
+    const d = new Date();
+    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+function nowStr() {
+    const d = new Date();
+    return `${today()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+// ===================== USER RENDERS =====================
+function renderUserAll() {
+    renderUserStats();
+    renderActivityTable();
+    renderMyEquipment();
+    renderTasks();
+    renderHistory();
+}
+
+function renderUserStats() {
+    const myEq = equipment.filter(e => e.holder === currentUser.fullName).length;
+    const openTasks = tasks.filter(t => t.status !== 'הושלם').length;
+    const dmg = damageReports.filter(d => d.reportedBy === currentUser.fullName && d.status !== 'תוקן').length;
+    document.getElementById('stat-my-equipment').textContent = myEq;
+    document.getElementById('stat-open-tasks').textContent = openTasks;
+    document.getElementById('stat-damage').textContent = dmg;
+}
+
+function renderActivityTable() {
+    const tb = document.getElementById('activity-table');
+    const rows = history.slice(-5).reverse();
+    tb.innerHTML = rows.map(r => `
+        <tr>
+            <td>${historyBadge(r.type)}</td>
+            <td>${r.equipment}</td>
+            <td>${r.date}</td>
+            <td>${r.type === 'שליחה' ? '<span class="badge badge-yellow">אצלי</span>' : r.type === 'קבלה' ? '<span class="badge badge-green">הוחזר</span>' : '<span class="badge badge-red">ניזוק</span>'}</td>
+        </tr>`).join('');
+}
+
+function renderMyEquipment() {
+    const tb = document.getElementById('my-equipment-table');
+    const mine = equipment.filter(e => e.holder === currentUser.fullName);
+    if (!mine.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין ציוד אצלך כרגע</td></tr>'; return; }
+    tb.innerHTML = mine.map(e => `
+        <tr>
+            <td><strong>${e.name}</strong></td>
+            <td>${e.category}</td>
+            <td>${today()}</td>
+            <td>—</td>
+            <td>${statusBadge(e.status)}</td>
+            <td><button class="btn btn-success btn-sm" onclick="openCheckinFor(${e.id})">החזר</button></td>
+        </tr>`).join('');
+}
+
+function renderTasks() {
+    const tb = document.getElementById('tasks-table');
+    tb.innerHTML = tasks.map(t => `
+        <tr>
+            <td><strong>${t.title}</strong></td>
+            <td>${t.desc}</td>
+            <td>${t.date}</td>
+            <td>${priorityBadge(t.priority)}</td>
+            <td>${taskStatusBadge(t.status)}</td>
+            <td>
+                ${t.status !== 'הושלם' ? `<button class="btn btn-success btn-sm" onclick="completeTask(${t.id})">✓ סיים</button>` : ''}
+                <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">🗑️</button>
+            </td>
+        </tr>`).join('');
+}
+
+function renderHistory() {
+    const tb = document.getElementById('history-table');
+    tb.innerHTML = [...history].reverse().map(r => `
+        <tr>
+            <td>${historyBadge(r.type)}</td>
+            <td>${r.equipment}</td>
+            <td>${r.date}</td>
+            <td>${r.detail}</td>
+        </tr>`).join('');
+}
+
+// ===================== ADMIN RENDERS =====================
+function renderAdminAll() {
+    renderAdminOverview();
+    renderAdminEquipment();
+    renderAdminUsers();
+    renderAdminDamage();
+    renderAdminInventory();
+    renderAdminReports();
+}
+
+function renderAdminOverview() {
+    const total     = equipment.length;
+    const available = equipment.filter(e => e.status === 'זמין').length;
+    const inuse     = equipment.filter(e => e.status === 'בשימוש').length;
+    const damaged   = equipment.filter(e => e.status === 'ניזוק' || e.status === 'בתיקון').length;
+    const activeUsers = USERS.filter(u => u.active).length;
+    const openDamage  = damageReports.filter(d => d.status !== 'תוקן').length;
+    document.getElementById('ov-total').textContent    = total;
+    document.getElementById('ov-available').textContent = available;
+    document.getElementById('ov-inuse').textContent    = inuse;
+    document.getElementById('ov-damaged').textContent  = damaged;
+    document.getElementById('ov-users').textContent    = activeUsers;
+    document.getElementById('ov-open-damage').textContent = openDamage;
+
+    const tb = document.getElementById('admin-activity-table');
+    tb.innerHTML = [...history].reverse().slice(0,5).map(r => `
+        <tr>
+            <td>${currentUser ? currentUser.fullName : '—'}</td>
+            <td>${historyBadge(r.type)}</td>
+            <td>${r.equipment}</td>
+            <td>${r.date}</td>
+        </tr>`).join('');
+}
+
+function renderAdminEquipment() {
+    const tb = document.getElementById('admin-equipment-table');
+    if (!equipment.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין ציוד במערכת</td></tr>'; return; }
+    tb.innerHTML = equipment.map(e => `
+        <tr>
+            <td><strong>${e.name}</strong></td>
+            <td>${e.category}</td>
+            <td>${e.sn}</td>
+            <td>${statusBadge(e.status)}</td>
+            <td>${e.holder || '—'}</td>
+            <td>
+                <button class="btn btn-ghost btn-sm" onclick="openEditEquipment(${e.id})">✏️ ערוך</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteEquipment(${e.id})">🗑️</button>
+            </td>
+        </tr>`).join('');
+}
+
+function renderAdminUsers() {
+    const tb = document.getElementById('admin-users-table');
+    tb.innerHTML = USERS.map(u => {
+        const eqCount = equipment.filter(e => e.holder === u.fullName).length;
+        const roleBadge = u.isAdmin ? '<span class="badge badge-purple">מנהל</span>' : '<span class="badge badge-blue">משתמש</span>';
+        const statusBdg = u.active ? '<span class="badge badge-green">✓ פעיל</span>' : '<span class="badge badge-red">✗ מושבת</span>';
+        const toggleBtn = u.isAdmin ? '' : u.active
+            ? `<button class="btn btn-danger btn-sm" onclick="toggleUser(${u.id})">🚫 השבת</button>`
+            : `<button class="btn btn-success btn-sm" onclick="toggleUser(${u.id})">✓ הפעל</button>`;
+        return `<tr>
+            <td><strong>${u.username}</strong></td>
+            <td>${u.fullName}</td>
+            <td>${roleBadge}</td>
+            <td>${eqCount}</td>
+            <td>${statusBdg}</td>
+            <td>${toggleBtn}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderAdminDamage() {
+    const tb = document.getElementById('admin-damage-table');
+    if (!damageReports.length) { tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין דוחות נזק</td></tr>'; return; }
+    tb.innerHTML = damageReports.map(d => {
+        const statusBdg = d.status === 'תוקן'
+            ? '<span class="badge badge-green">תוקן</span>'
+            : '<span class="badge badge-yellow">בתיקון</span>';
+        const actions = d.status !== 'תוקן'
+            ? `<button class="btn btn-success btn-sm" onclick="markFixed(${d.id})">✓ תוקן</button>
+               <button class="btn btn-danger btn-sm" onclick="scraptDamage(${d.id})">🗑️ גרוט</button>`
+            : '';
+        return `<tr>
+            <td><strong>${d.equipmentName}</strong></td>
+            <td>${d.reportedBy}</td>
+            <td>${d.desc}</td>
+            <td>${severityBadge(d.severity)}</td>
+            <td>${statusBdg}</td>
+            <td>
+                ${actions}
+                <button class="btn btn-ghost btn-sm" onclick="showDamageDetails(${d.id})">📄 פרטים</button>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+function renderAdminInventory() {
+    const tb = document.getElementById('admin-inventory-table');
+    const cats = [...new Set(equipment.map(e => e.category))];
+    let rows = cats.map(cat => {
+        const items = equipment.filter(e => e.category === cat);
+        const total = items.length;
+        const avail = items.filter(e => e.status === 'זמין').length;
+        const inuse = items.filter(e => e.status === 'בשימוש').length;
+        const dmg   = items.filter(e => e.status === 'ניזוק' || e.status === 'בתיקון').length;
+        const pct   = total ? Math.round((avail / total) * 100) : 0;
+        const cls   = pct >= 60 ? 'badge-green' : pct >= 30 ? 'badge-yellow' : 'badge-red';
+        return `<tr><td><strong>${cat}</strong></td><td>${total}</td><td>${avail}</td><td>${inuse}</td><td>${dmg}</td><td><span class="badge ${cls}">${pct}%</span></td></tr>`;
+    });
+    const total = equipment.length;
+    const avail = equipment.filter(e => e.status === 'זמין').length;
+    const inuse = equipment.filter(e => e.status === 'בשימוש').length;
+    const dmg   = equipment.filter(e => e.status === 'ניזוק' || e.status === 'בתיקון').length;
+    const pct   = total ? Math.round((avail/total)*100) : 0;
+    rows.push(`<tr style="font-weight:600;background:var(--bg)"><td>סה"כ</td><td>${total}</td><td>${avail}</td><td>${inuse}</td><td>${dmg}</td><td><span class="badge badge-blue">${pct}%</span></td></tr>`);
+    tb.innerHTML = rows.join('');
+}
+
+function renderAdminReports() {
+    const checkouts = history.filter(h => h.type === 'שליחה').length;
+    const checkins  = history.filter(h => h.type === 'קבלה').length;
+    const damages   = damageReports.length;
+    document.getElementById('rep-checkouts').textContent = checkouts;
+    document.getElementById('rep-checkins').textContent  = checkins;
+    document.getElementById('rep-damages').textContent   = damages;
+    document.getElementById('rep-added').textContent     = equipment.length;
+    const tb = document.getElementById('rep-users-table');
+    tb.innerHTML = USERS.filter(u => !u.isAdmin).map(u => {
+        const cnt = history.filter(h => h.equipment && equipment.some(e => e.name === h.equipment && e.holder === u.fullName)).length;
+        return `<tr><td>${u.fullName}</td><td><strong>${cnt} פעולות</strong></td></tr>`;
+    }).join('');
+}
+
+// ===================== EQUIPMENT ACTIONS =====================
+function openEditEquipment(id) {
+    const e = equipment.find(x => x.id === id);
+    if (!e) return;
+    document.getElementById('edit-eq-id').value   = e.id;
+    document.getElementById('edit-eq-name').value = e.name;
+    document.getElementById('edit-eq-sn').value   = e.sn;
+    document.getElementById('edit-eq-desc').value = e.desc;
+    const catSel = document.getElementById('edit-eq-cat');
+    [...catSel.options].forEach(o => o.selected = o.value === e.category);
+    const stSel = document.getElementById('edit-eq-status');
+    [...stSel.options].forEach(o => o.selected = o.value === e.status);
+    openModal('edit-equipment-modal');
+}
+
+function saveEditEquipment() {
+    const id = parseInt(document.getElementById('edit-eq-id').value);
+    const e = equipment.find(x => x.id === id);
+    if (!e) return;
+    e.name     = document.getElementById('edit-eq-name').value.trim();
+    e.category = document.getElementById('edit-eq-cat').value;
+    e.sn       = document.getElementById('edit-eq-sn').value.trim();
+    e.status   = document.getElementById('edit-eq-status').value;
+    e.desc     = document.getElementById('edit-eq-desc').value.trim();
+    if (e.status !== 'בשימוש') e.holder = '';
+    closeModal('edit-equipment-modal');
+    renderAdminEquipment();
+    renderAdminInventory();
+    renderAdminOverview();
+    showToast('הציוד עודכן בהצלחה ✅');
+}
+
+function deleteEquipment(id) {
+    const e = equipment.find(x => x.id === id);
+    if (!e) return;
+    if (!confirm(`האם למחוק את "${e.name}"?`)) return;
+    equipment = equipment.filter(x => x.id !== id);
+    renderAdminEquipment();
+    renderAdminInventory();
+    renderAdminOverview();
+    showToast('הציוד נמחק ✅');
+}
+
+function addEquipment() {
+    const name = document.getElementById('new-eq-name').value.trim();
+    const cat  = document.getElementById('new-eq-cat').value;
+    const sn   = document.getElementById('new-eq-sn').value.trim();
+    const desc = document.getElementById('new-eq-desc').value.trim();
+    if (!name) { alert('יש להזין שם ציוד'); return; }
+    equipment.push({ id: nextEqId++, name, category: cat, sn, status: 'זמין', holder: '', desc });
+    document.getElementById('new-eq-name').value = '';
+    document.getElementById('new-eq-sn').value   = '';
+    document.getElementById('new-eq-desc').value = '';
+    closeModal('add-equipment-modal');
+    renderAdminEquipment();
+    renderAdminInventory();
+    renderAdminOverview();
+    showToast('הציוד נוסף בהצלחה ✅');
+}
+
+// ===================== CSV =====================
+function importCSV() { document.getElementById('csv-file-input').click(); }
+
+function handleCSV(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const lines = e.target.result.split('\n').filter(l => l.trim());
+        let added = 0;
+        lines.forEach((line, i) => {
+            if (i === 0 && line.includes('שם')) return; // skip header
+            const parts = line.split(',').map(p => p.trim().replace(/^"|"$/g,''));
+            if (parts.length >= 1 && parts[0]) {
+                equipment.push({ id: nextEqId++, name: parts[0], category: parts[1]||'אחר', sn: parts[2]||'', status: 'זמין', holder: '', desc: '' });
+                added++;
+            }
         });
-    });
+        input.value = '';
+        renderAdminEquipment();
+        renderAdminInventory();
+        renderAdminOverview();
+        showToast(`יובאו ${added} פריטים מ-CSV ✅`);
+    };
+    reader.readAsText(file, 'UTF-8');
+}
 
-    // Enter key login
-    document.getElementById('password').addEventListener('keydown', e => {
-        if (e.key === 'Enter') doLogin();
-    });
+function exportCSV() {
+    const header = 'שם,קטגוריה,S/N,סטטוס,נמצא אצל';
+    const rows = equipment.map(e => `"${e.name}","${e.category}","${e.sn}","${e.status}","${e.holder}"`);
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'equipment.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('הקובץ יוצא בהצלחה ✅');
+}
 
-    function showSuccess(msg) {
-        const toast = document.getElementById('toast');
-        document.getElementById('toast-msg').textContent = msg;
-        toast.style.display = 'block';
-        setTimeout(() => toast.style.display = 'none', 3000);
-    }
+// ===================== USER ACTIONS =====================
+function toggleUser(id) {
+    const u = USERS.find(x => x.id === id);
+    if (!u) return;
+    u.active = !u.active;
+    renderAdminUsers();
+    renderAdminOverview();
+    showToast(u.active ? `${u.fullName} הופעל ✅` : `${u.fullName} הושבת ✅`);
+}
+
+function addUser() {
+    const uname = document.getElementById('new-user-username').value.trim();
+    const fname = document.getElementById('new-user-fullname').value.trim();
+    const pwd   = document.getElementById('new-user-password').value;
+    const isAdm = document.getElementById('new-user-role').value === 'true';
+    if (!uname || !fname || !pwd) { alert('יש למלא את כל השדות'); return; }
+    if (USERS.find(u => u.username === uname)) { alert('שם משתמש כבר קיים'); return; }
+    USERS.push({ id: USERS.length + 10, username: uname, password: pwd, isAdmin: isAdm, fullName: fname, active: true });
+    document.getElementById('new-user-username').value = '';
+    document.getElementById('new-user-fullname').value = '';
+    document.getElementById('new-user-password').value = '';
+    closeModal('add-user-modal');
+    renderAdminUsers();
+    renderAdminOverview();
+    showToast('המשתמש נוסף בהצלחה ✅');
+}
+
+// ===================== DAMAGE ACTIONS =====================
+function markFixed(id) {
+    const d = damageReports.find(x => x.id === id);
+    if (!d) return;
+    d.status = 'תוקן';
+    const eq = equipment.find(e => e.name === d.equipmentName);
+    if (eq && eq.status === 'ניזוק') eq.status = 'זמין';
+    renderAdminDamage();
+    renderAdminEquipment();
+    renderAdminOverview();
+    showToast('הציוד סומן כתוקן ✅');
+}
+
+function scraptDamage(id) {
+    const d = damageReports.find(x => x.id === id);
+    if (!d) return;
+    if (!confirm(`לגרוט את הדוח על "${d.equipmentName}"?`)) return;
+    const idx = damageReports.findIndex(x => x.id === id);
+    damageReports.splice(idx, 1);
+    renderAdminDamage();
+    renderAdminOverview();
+    showToast('הדוח הוסר ✅');
+}
+
+function showDamageDetails(id) {
+    const d = damageReports.find(x => x.id === id);
+    if (!d) return;
+    document.getElementById('damage-details-content').innerHTML = `
+        <div class="form-group"><label>ציוד</label><p>${d.equipmentName}</p></div>
+        <div class="form-group"><label>מדווח ע"י</label><p>${d.reportedBy}</p></div>
+        <div class="form-group"><label>תאריך</label><p>${d.date}</p></div>
+        <div class="form-group"><label>חומרה</label><p>${severityBadge(d.severity)}</p></div>
+        <div class="form-group"><label>סטטוס</label><p>${d.status === 'תוקן' ? '<span class="badge badge-green">תוקן</span>' : '<span class="badge badge-yellow">בתיקון</span>'}</p></div>
+        <div class="form-group"><label>תיאור</label><p>${d.desc}</p></div>
+    `;
+    openModal('damage-details-modal');
+}
+
+// ===================== CHECKOUT / CHECKIN =====================
+function populateCheckoutSelect() {
+    const sel = document.getElementById('checkout-item');
+    const available = equipment.filter(e => e.status === 'זמין');
+    sel.innerHTML = available.length
+        ? available.map(e => `<option value="${e.id}">${e.name} (${e.sn})</option>`).join('')
+        : '<option disabled>אין ציוד זמין</option>';
+}
+
+function populateCheckinSelect() {
+    const sel = document.getElementById('checkin-item');
+    const mine = currentUser ? equipment.filter(e => e.holder === currentUser.fullName) : [];
+    sel.innerHTML = mine.length
+        ? mine.map(e => `<option value="${e.id}">${e.name}</option>`).join('')
+        : '<option disabled>אין ציוד אצלך</option>';
+}
+
+function openCheckinFor(id) {
+    openModal('checkin-modal');
+    setTimeout(() => {
+        const sel = document.getElementById('checkin-item');
+        [...sel.options].forEach(o => o.selected = parseInt(o.value) === id);
+    }, 50);
+}
+
+function populateDamageSelect() {
+    const sel = document.getElementById('damage-item');
+    sel.innerHTML = equipment.map(e => `<option value="${e.id}">${e.name}</option>`).join('');
+}
+
+function doCheckout() {
+    const sel = document.getElementById('checkout-item');
+    const id  = parseInt(sel.value);
+    const e   = equipment.find(x => x.id === id);
+    if (!e || !currentUser) return;
+    e.status = 'בשימוש';
+    e.holder = currentUser.fullName;
+    history.push({ type: 'שליחה', equipment: e.name, date: nowStr(), detail: '—' });
+    closeModal('checkout-modal');
+    renderUserAll();
+    showToast(`${e.name} נשלח בהצלחה ✅`);
+}
+
+function doCheckin() {
+    const sel  = document.getElementById('checkin-item');
+    const id   = parseInt(sel.value);
+    const cond = document.getElementById('checkin-condition').value;
+    const e    = equipment.find(x => x.id === id);
+    if (!e) return;
+    e.status = cond === 'ניזוק' ? 'ניזוק' : 'זמין';
+    e.holder = '';
+    history.push({ type: 'קבלה', equipment: e.name, date: nowStr(), detail: `מצב: ${cond}` });
+    closeModal('checkin-modal');
+    renderUserAll();
+    showToast(`${e.name} הוחזר בהצלחה ✅`);
+}
+
+function doDamageReport() {
+    const sel  = document.getElementById('damage-item');
+    const id   = parseInt(sel.value);
+    const desc = document.getElementById('damage-desc').value.trim();
+    const sev  = document.getElementById('damage-severity').value;
+    const e    = equipment.find(x => x.id === id);
+    if (!e || !desc) { alert('יש למלא תיאור נזק'); return; }
+    e.status = 'ניזוק';
+    damageReports.push({ id: nextDamageId++, equipmentName: e.name, reportedBy: currentUser ? currentUser.fullName : 'לא ידוע', desc, severity: sev, status: 'בתיקון', date: today() });
+    history.push({ type: 'נזק', equipment: e.name, date: nowStr(), detail: desc });
+    document.getElementById('damage-desc').value = '';
+    closeModal('damage-modal');
+    renderUserAll();
+    showToast('דוח הנזק נשלח למנהל ✅');
+}
+
+// ===================== TASK ACTIONS =====================
+function addTask() {
+    const title    = document.getElementById('task-title').value.trim();
+    const desc     = document.getElementById('task-desc').value.trim();
+    const priority = document.getElementById('task-priority').value;
+    const date     = document.getElementById('task-date').value;
+    if (!title) { alert('יש להזין כותרת'); return; }
+    const fmtDate = date ? date.split('-').reverse().join('/') : today();
+    tasks.push({ id: nextTaskId++, title, desc, date: fmtDate, priority, status: 'פתוח' });
+    document.getElementById('task-title').value = '';
+    document.getElementById('task-desc').value  = '';
+    document.getElementById('task-date').value  = '';
+    closeModal('task-modal');
+    renderTasks();
+    renderUserStats();
+    showToast('המשימה נוצרה בהצלחה ✅');
+}
+
+function completeTask(id) {
+    const t = tasks.find(x => x.id === id);
+    if (t) t.status = 'הושלם';
+    renderTasks();
+    renderUserStats();
+    showToast('המשימה סומנה כהושלמה ✅');
+}
+
+function deleteTask(id) {
+    const idx = tasks.findIndex(x => x.id === id);
+    if (idx !== -1) tasks.splice(idx, 1);
+    renderTasks();
+    renderUserStats();
+    showToast('המשימה נמחקה ✅');
+}
+
+// ===================== KEYBOARD =====================
+document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('username').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('password').focus(); });
 </script>
 </body>
 </html>
