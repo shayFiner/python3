@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ניהול ציוד - Demo</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.12);
+            --radius: 0.75rem;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            direction: rtl;
+            min-height: 100vh;
+        }
+
+        /* ======== SCREENS ======== */
+        .screen { display: none; min-height: 100vh; }
+        .screen.active { display: flex; flex-direction: column; }
+
+        /* ======== LOGIN ======== */
+        #login-screen {
+            background: linear-gradient(135deg, #1e3a8a 0%, #7c3aed 50%, #be185d 100%);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-logo .icon {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 0.75rem;
+        }
+
+        .login-logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .login-logo p {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .form-group { margin-bottom: 1.25rem; }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 0.6rem;
+            font-size: 1rem;
+            direction: ltr;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.6rem;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--primary); color: white; width: 100%; margin-top: 0.5rem; }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+        .btn-ghost:hover { background: var(--bg); }
+        .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+
+        .demo-hint {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 0.6rem;
+            padding: 1rem;
+            margin-top: 1.25rem;
+            font-size: 0.85rem;
+        }
+
+        .demo-hint p { margin-bottom: 0.3rem; color: var(--text); }
+        .demo-hint .tag { display: inline-block; background: #0ea5e9; color: white; border-radius: 0.3rem; padding: 0.1rem 0.5rem; font-size: 0.75rem; margin-inline-start: 0.3rem; }
+
+        .error-msg {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* ======== NAVBAR ======== */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-links {
+            display: flex;
+            gap: 0.25rem;
+            list-style: none;
+        }
+
+        .navbar-links a {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .navbar-links a:hover, .navbar-links a.active {
+            background: #eff6ff;
+            color: var(--primary);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #7c3aed, #be185d);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-weight: 600;
+        }
+
+        /* ======== MAIN CONTENT ======== */
+        .main-content { flex: 1; padding: 2rem 1.5rem; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+        /* ======== CARDS ======== */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ======== STATS ======== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-label { color: var(--text-light); font-size: 0.85rem; margin-bottom: 0.4rem; }
+        .stat-value { font-size: 2rem; font-weight: 700; }
+        .stat-icon { font-size: 2.5rem; }
+
+        /* ======== GRID ======== */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+
+        /* ======== TABLE ======== */
+        .table-wrap { overflow-x: auto; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        thead { background: var(--bg); }
+        th { padding: 0.75rem 1rem; text-align: right; font-weight: 600; border-bottom: 2px solid var(--border); white-space: nowrap; }
+        td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); }
+        tbody tr:hover { background: var(--bg); }
+
+        /* ======== BADGE ======== */
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-green { background: #d1fae5; color: #065f46; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+        .badge-yellow { background: #fef3c7; color: #92400e; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-purple { background: #ede9fe; color: #5b21b6; }
+
+        /* ======== ADMIN SIDEBAR ======== */
+        .admin-layout {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .sidebar {
+            width: 220px;
+            flex-shrink: 0;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 1rem;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar h4 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-light); margin-bottom: 0.75rem; padding: 0 0.5rem; }
+
+        .sidebar-menu { list-style: none; }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 0.5rem;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-menu li a:hover { background: #eff6ff; color: var(--primary); }
+        .sidebar-menu li a.active { background: var(--primary); color: white; }
+
+        .admin-content { flex: 1; min-width: 0; }
+
+        /* ======== TABS ======== */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ======== MODAL ======== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 1rem;
+            display: none;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 480px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal h3 { font-size: 1.2rem; margin-bottom: 1.5rem; }
+
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            justify-content: flex-end;
+        }
+
+        /* ======== QUICK ACTIONS ======== */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-card {
+            background: white;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.15);
+            transform: translateY(-2px);
+        }
+
+        .action-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .action-card .label { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+
+        /* ======== ALERT ======== */
+        .alert {
+            padding: 0.875rem 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-warning { background: #fef3c7; border-left: 4px solid var(--warning); color: #92400e; }
+        .alert-info { background: #dbeafe; border-left: 4px solid var(--primary); color: #1e40af; }
+        .alert-success { background: #d1fae5; border-left: 4px solid var(--success); color: #065f46; }
+
+        /* ======== PAGE TITLE ======== */
+        .page-title { margin-bottom: 1.5rem; }
+        .page-title h2 { font-size: 1.5rem; font-weight: 700; }
+        .page-title p { color: var(--text-light); margin-top: 0.25rem; font-size: 0.9rem; }
+
+        /* ======== RESPONSIVE ======== */
+        @media (max-width: 768px) {
+            .navbar-links { display: none; }
+            .sidebar { display: none; }
+            .admin-layout { flex-direction: column; }
+            .main-content { padding: 1rem; }
+        }
+
+        /* ======== SPINNER ======== */
+        .login-loading {
+            display: none;
+            text-align: center;
+            color: var(--primary);
+            font-weight: 500;
+            margin-top: 1rem;
+        }
+
+        /* Page indicator */
+        .demo-banner {
+            background: linear-gradient(90deg, #7c3aed, #2563eb);
+            color: white;
+            text-align: center;
+            padding: 0.4rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div id="login-screen" class="screen active">
+    <div class="login-box">
+        <div class="login-logo">
+            <span class="icon">📦</span>
+            <h1>מערכת ניהול ציוד</h1>
+            <p>Equipment Management System</p>
+        </div>
+
+        <div id="login-error" class="error-msg">שם משתמש או סיסמה שגויים</div>
+
+        <div class="form-group">
+            <label>שם משתמש</label>
+            <input type="text" id="username" placeholder="הכנס שם משתמש" autocomplete="username">
+        </div>
+
+        <div class="form-group">
+            <label>סיסמה</label>
+            <input type="password" id="password" placeholder="הכנס סיסמה" autocomplete="current-password">
+        </div>
+
+        <button class="btn btn-primary" onclick="doLogin()">🔐 כניסה למערכת</button>
+
+        <div class="demo-hint">
+            <p>👤 משתמש: <strong>user</strong> | סיסמה: <strong>1234</strong> <span class="tag">משתמש</span></p>
+            <p style="margin-top:0.5rem">👨‍💼 משתמש: <strong>admin</strong> | סיסמה: <strong>admin123</strong> <span class="tag">מנהל</span></p>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== USER DASHBOARD ==================== -->
+<div id="user-screen" class="screen">
+    <div class="demo-banner">🎭 מצב Demo — המערכת האמיתית תחובר ל-Database</div>
+    <nav class="navbar">
+        <div class="navbar-brand">📦 מערכת ניהול ציוד</div>
+        <ul class="navbar-links">
+            <li><a class="active" onclick="showUserTab('dashboard')">דשבורד</a></li>
+            <li><a onclick="showUserTab('myequipment')">הציוד שלי</a></li>
+            <li><a onclick="showUserTab('tasks')">משימות</a></li>
+            <li><a onclick="showUserTab('history')">היסטוריה</a></li>
+        </ul>
+        <div class="navbar-user">
+            <span id="user-name-display">user</span>
+            <div class="avatar" id="user-avatar">U</div>
+            <button class="btn btn-ghost btn-sm" onclick="doLogout()">יציאה</button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <!-- Dashboard Tab -->
+        <div id="user-dashboard" class="tab-content active">
+            <div class="page-title">
+                <h2>👋 שלום, <span id="user-greeting">שי!</span></h2>
+                <p>הנה סיכום הפעילות שלך</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">ציוד אצלי</div>
+                        <div class="stat-value" style="color:var(--primary)">3</div>
+                    </div>
+                    <div class="stat-icon">📤</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">משימות פתוחות</div>
+                        <div class="stat-value" style="color:var(--warning)">2</div>
+                    </div>
+                    <div class="stat-icon">📋</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">דוחות נזק</div>
+                        <div class="stat-value" style="color:var(--danger)">1</div>
+                    </div>
+                    <div class="stat-icon">⚠️</div>
+                </div>
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-label">הוחזרו החודש</div>
+                        <div class="stat-value" style="color:var(--success)">5</div>
+                    </div>
+                    <div class="stat-icon">✅</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">🚀 פעולות מהירות</div>
+                <div class="quick-actions">
+                    <div class="action-card" onclick="openModal('checkout-modal')">
+                        <div class="icon">📤</div>
+                        <div class="label">שליחת ציוד</div>
+                    </div>
+                    <div class="action-card" onclick="openModal('checkin-modal')">
+                        <div class="icon">📥</div>
+                        <div class="label">החזרת ציוד</div>
+                    </div>
+                    <div class="action-card" onclick="openModal('damage-modal')">
+                        <div class="icon">⚠️</div>
+                        <div class="label">דיווח נזק</div>
+                    </div>
+                    <div class="action-card" onclick="openModal('task-modal')">
+                        <div class="icon">➕</div>
+                        <div class="label">משימה חדשה</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">📊 פעילות אחרונה</div>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>פעילות</th><th>ציוד</th><th>תאריך</th><th>סטטוס</th></tr></thead>
+                        <tbody>
+                            <tr><td>שליחה</td><td>מיקרופון Shure SM58</td><td>18/03/2026</td><td><span class="badge badge-yellow">אצלי</span></td></tr>
+                            <tr><td>שליחה</td><td>כבל XLR 5מ׳</td><td>17/03/2026</td><td><span class="badge badge-yellow">אצלי</span></td></tr>
+                            <tr><td>קבלה</td><td>מעמד מיקרופון</td><td>15/03/2026</td><td><span class="badge badge-green">הוחזר</span></td></tr>
+                            <tr><td>דיווח נזק</td><td>כבל USB</td><td>14/03/2026</td><td><span class="badge badge-red">ניזוק</span></td></tr>
+                            <tr><td>שליחה</td><td>רמקול JBL נייד</td><td>12/03/2026</td><td><span class="badge badge-yellow">אצלי</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Equipment Tab -->
+        <div id="user-myequipment" class="tab-content">
+            <div class="page-title">
+                <h2>📦 הציוד שלי</h2>
+                <p>ציוד שנמצא כרגע אצלך</p>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>ציוד</th><th>קטגוריה</th><th>נלקח בתאריך</th><th>תאריך החזרה</th><th>מצב</th><th>פעולות</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>מיקרופון Shure SM58</strong></td>
+                                <td>אודיו</td>
+                                <td>18/03/2026</td>
+                                <td>25/03/2026</td>
+                                <td><span class="badge badge-green">תקין</span></td>
+                                <td><button class="btn btn-success btn-sm" onclick="openModal('checkin-modal')">החזר</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>כבל XLR 5מ׳</strong></td>
+                                <td>כבלים</td>
+                                <td>17/03/2026</td>
+                                <td>20/03/2026</td>
+                                <td><span class="badge badge-red">⚠️ פג תאריך</span></td>
+                                <td><button class="btn btn-success btn-sm" onclick="openModal('checkin-modal')">החזר</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>רמקול JBL נייד</strong></td>
+                                <td>אודיו</td>
+                                <td>12/03/2026</td>
+                                <td>19/03/2026</td>
+                                <td><span class="badge badge-yellow">לוחץ</span></td>
+                                <td><button class="btn btn-success btn-sm" onclick="openModal('checkin-modal')">החזר</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Tab -->
+        <div id="user-tasks" class="tab-content">
+            <div class="page-title">
+                <h2>📋 המשימות שלי</h2>
+                <p>משימות פתוחות ומוגמרות</p>
+            </div>
+            <div style="margin-bottom:1rem;">
+                <button class="btn btn-primary btn-sm" onclick="openModal('task-modal')">➕ משימה חדשה</button>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>משימה</th><th>תיאור</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>החזרת ציוד לאולם</strong></td><td>להחזיר את כל הציוד לאולם ב׳</td><td>20/03/2026</td><td><span class="badge badge-red">גבוה</span></td><td><span class="badge badge-yellow">פתוח</span></td></tr>
+                            <tr><td><strong>בדיקת רמקולים</strong></td><td>לבדוק שכל הרמקולים עובדים</td><td>22/03/2026</td><td><span class="badge badge-blue">בינוני</span></td><td><span class="badge badge-yellow">פתוח</span></td></tr>
+                            <tr><td><strong>הזמנת כבלים חדשים</strong></td><td>הזמין 5 כבלי XLR חדשים</td><td>15/03/2026</td><td><span class="badge badge-green">נמוך</span></td><td><span class="badge badge-green">הושלם</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="user-history" class="tab-content">
+            <div class="page-title">
+                <h2>📈 היסטוריה</h2>
+                <p>כל הפעילויות שלך מהתחלה</p>
+            </div>
+            <div class="card">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>פעילות</th><th>ציוד</th><th>תאריך</th><th>פרטים</th></tr></thead>
+                        <tbody>
+                            <tr><td><span class="badge badge-blue">שליחה</span></td><td>מיקרופון Shure SM58</td><td>18/03/2026 09:30</td><td>—</td></tr>
+                            <tr><td><span class="badge badge-blue">שליחה</span></td><td>כבל XLR 5מ׳</td><td>17/03/2026 14:15</td><td>—</td></tr>
+                            <tr><td><span class="badge badge-green">קבלה</span></td><td>מעמד מיקרופון</td><td>15/03/2026 11:00</td><td>מצב: תקין</td></tr>
+                            <tr><td><span class="badge badge-red">נזק</span></td><td>כבל USB</td><td>14/03/2026 16:45</td><td>חוט פנימי שבור</td></tr>
+                            <tr><td><span class="badge badge-blue">שליחה</span></td><td>רמקול JBL נייד</td><td>12/03/2026 08:20</td><td>—</td></tr>
+                            <tr><td><span class="badge badge-green">קבלה</span></td><td>מעמד מיקרופון</td><td>10/03/2026 17:30</td><td>מצב: תקין</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== ADMIN DASHBOARD ==================== -->
+<div id="admin-screen" class="screen">
+    <div class="demo-banner">🎭 מצב Demo — המערכת האמיתית תחובר ל-Database</div>
+    <nav class="navbar">
+        <div class="navbar-brand">👨‍💼 פאנל ניהול</div>
+        <ul class="navbar-links">
+            <li><a href="#" onclick="showScreen('user-screen'); return false;" style="color:var(--text-light)">← חזור לדשבורד</a></li>
+        </ul>
+        <div class="navbar-user">
+            <span class="admin-badge">מנהל</span>
+            <div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#be185d)">A</div>
+            <button class="btn btn-ghost btn-sm" onclick="doLogout()">יציאה</button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <h4>תפריט</h4>
+                <ul class="sidebar-menu">
+                    <li><a class="active" onclick="showAdminTab('admin-overview')">📊 סקירה כללית</a></li>
+                    <li><a onclick="showAdminTab('admin-equipment')">📦 ניהול ציוד</a></li>
+                    <li><a onclick="showAdminTab('admin-users')">👥 ניהול משתמשים</a></li>
+                    <li><a onclick="showAdminTab('admin-damage')">⚠️ דוחות נזק</a></li>
+                    <li><a onclick="showAdminTab('admin-inventory')">📊 מלאי</a></li>
+                    <li><a onclick="showAdminTab('admin-reports')">📈 דוחות</a></li>
+                </ul>
+            </aside>
+
+            <!-- Admin Content -->
+            <div class="admin-content">
+
+                <!-- Overview Tab -->
+                <div id="admin-overview" class="tab-content active">
+                    <div class="page-title">
+                        <h2>📊 סקירה כללית</h2>
+                        <p>סטטוס המערכת בזמן אמת</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card"><div><div class="stat-label">סה"כ ציוד</div><div class="stat-value" style="color:var(--primary)">45</div></div><div class="stat-icon">📦</div></div>
+                        <div class="stat-card"><div><div class="stat-label">ציוד זמין</div><div class="stat-value" style="color:var(--success)">28</div></div><div class="stat-icon">✅</div></div>
+                        <div class="stat-card"><div><div class="stat-label">בשימוש</div><div class="stat-value" style="color:var(--warning)">14</div></div><div class="stat-icon">📤</div></div>
+                        <div class="stat-card"><div><div class="stat-label">ניזוק/בתיקון</div><div class="stat-value" style="color:var(--danger)">3</div></div><div class="stat-icon">🔧</div></div>
+                        <div class="stat-card"><div><div class="stat-label">משתמשים פעילים</div><div class="stat-value" style="color:var(--primary)">12</div></div><div class="stat-icon">👥</div></div>
+                        <div class="stat-card"><div><div class="stat-label">פעולות היום</div><div class="stat-value" style="color:var(--success)">8</div></div><div class="stat-icon">⚡</div></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title">📋 פעילויות אחרונות במערכת</div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>משתמש</th><th>פעולה</th><th>ציוד</th><th>זמן</th></tr></thead>
+                                <tbody>
+                                    <tr><td>שי בר</td><td><span class="badge badge-blue">שליחה</span></td><td>מיקרופון Shure SM58</td><td>היום 09:30</td></tr>
+                                    <tr><td>דויד כהן</td><td><span class="badge badge-green">קבלה</span></td><td>מעמד מיקרופון</td><td>היום 08:15</td></tr>
+                                    <tr><td>שרה דוד</td><td><span class="badge badge-red">נזק</span></td><td>כבל USB</td><td>אתמול 16:45</td></tr>
+                                    <tr><td>יוסי לוי</td><td><span class="badge badge-blue">שליחה</span></td><td>רמקול JBL נייד</td><td>אתמול 10:20</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equipment Tab -->
+                <div id="admin-equipment" class="tab-content">
+                    <div class="page-title">
+                        <h2>📦 ניהול ציוד</h2>
+                        <p>הוסף, ערוך ונהל את כל הציוד במערכת</p>
+                    </div>
+
+                    <div class="alert alert-warning">⚠️ <strong>שטח מנהל בלבד:</strong> רק מנהלים יכולים להוסיף, לערוך ולמחוק ציוד.</div>
+
+                    <div style="margin-bottom:1rem; display:flex; gap:0.75rem; flex-wrap:wrap;">
+                        <button class="btn btn-primary btn-sm" onclick="openModal('add-equipment-modal')">➕ הוסף ציוד</button>
+                        <button class="btn btn-ghost btn-sm">📥 ייבוא CSV</button>
+                        <button class="btn btn-ghost btn-sm">📤 ייצוא</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>שם הציוד</th><th>קטגוריה</th><th>S/N</th><th>סטטוס</th><th>נמצא אצל</th><th>פעולות</th></tr></thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>מיקרופון Shure SM58</strong></td><td>אודיו</td><td>MIC-001</td>
+                                        <td><span class="badge badge-yellow">בשימוש</span></td><td>שי בר</td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>מעמד מיקרופון</strong></td><td>תמיכה</td><td>STAND-001</td>
+                                        <td><span class="badge badge-green">זמין</span></td><td>—</td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>כבל USB</strong></td><td>כבלים</td><td>CABLE-001</td>
+                                        <td><span class="badge badge-red">ניזוק</span></td><td>—</td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>רמקול JBL נייד</strong></td><td>אודיו</td><td>SPEAKER-001</td>
+                                        <td><span class="badge badge-yellow">בשימוש</span></td><td>שי בר</td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>כבל XLR 5מ׳</strong></td><td>כבלים</td><td>XLR-001</td>
+                                        <td><span class="badge badge-yellow">בשימוש</span></td><td>שי בר</td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🗑️</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="admin-users" class="tab-content">
+                    <div class="page-title">
+                        <h2>👥 ניהול משתמשים</h2>
+                        <p>נהל הרשאות, סטטוסים ומידע על משתמשים</p>
+                    </div>
+
+                    <div class="alert alert-warning">⚠️ <strong>שטח מנהל בלבד:</strong> רק מנהלים יכולים ליצור ולמחוק משתמשים.</div>
+
+                    <div style="margin-bottom:1rem;">
+                        <button class="btn btn-primary btn-sm" onclick="openModal('add-user-modal')">➕ הוסף משתמש</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>משתמש</th><th>שם מלא</th><th>דוא"ל</th><th>תפקיד</th><th>ציוד אצלו</th><th>פעיל</th><th>פעולות</th></tr></thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>admin</strong></td><td>מנהל מערכת</td><td>admin@system.com</td>
+                                        <td><span class="badge badge-purple">מנהל</span></td><td>0</td>
+                                        <td><span class="badge badge-green">✓</span></td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>user</strong></td><td>שי בר</td><td>user@system.com</td>
+                                        <td><span class="badge badge-blue">משתמש</span></td><td>3</td>
+                                        <td><span class="badge badge-green">✓</span></td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🚫 השבת</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>david</strong></td><td>דויד כהן</td><td>david@system.com</td>
+                                        <td><span class="badge badge-blue">משתמש</span></td><td>1</td>
+                                        <td><span class="badge badge-green">✓</span></td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-danger btn-sm">🚫 השבת</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>sarah</strong></td><td>שרה דוד</td><td>sarah@system.com</td>
+                                        <td><span class="badge badge-blue">משתמש</span></td><td>0</td>
+                                        <td><span class="badge badge-red">✗ מושבת</span></td>
+                                        <td><button class="btn btn-ghost btn-sm">✏️ ערוך</button> <button class="btn btn-success btn-sm">✓ הפעל</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Damage Tab -->
+                <div id="admin-damage" class="tab-content">
+                    <div class="page-title">
+                        <h2>⚠️ דוחות נזק</h2>
+                        <p>נהל דוחות נזק ועדכן סטטוס תיקון</p>
+                    </div>
+                    <div class="alert alert-warning">⚠️ <strong>שטח מנהל בלבד:</strong> רק מנהלים יכולים לעדכן סטטוסי תיקון.</div>
+                    <div class="card">
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>ציוד</th><th>מדווח ע"י</th><th>תיאור</th><th>חומרה</th><th>סטטוס</th><th>פעולות מנהל</th></tr></thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>כבל USB</strong></td><td>שי בר</td><td>חוט פנימי שבור</td>
+                                        <td><span class="badge badge-red">חמור</span></td>
+                                        <td><span class="badge badge-yellow">בתיקון</span></td>
+                                        <td>
+                                            <button class="btn btn-success btn-sm">✓ תוקן</button>
+                                            <button class="btn btn-danger btn-sm">🗑️ גרוט</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>מעמד מיקרופון</strong></td><td>דויד כהן</td><td>שריטה בחלק העליון</td>
+                                        <td><span class="badge badge-blue">קל</span></td>
+                                        <td><span class="badge badge-green">תוקן</span></td>
+                                        <td><button class="btn btn-ghost btn-sm">📄 פרטים</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div id="admin-inventory" class="tab-content">
+                    <div class="page-title">
+                        <h2>📊 ניהול מלאי</h2>
+                        <p>סקירה מלאה של כל הציוד לפי קטגוריה</p>
+                    </div>
+                    <div class="alert alert-info">ℹ️ <strong>שטח מנהל בלבד:</strong> דוח מלאי מלא ומפורט.</div>
+                    <div class="card">
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>קטגוריה</th><th>סה"כ</th><th>זמין</th><th>בשימוש</th><th>ניזוק</th><th>בתיקון</th><th>%ניצולת</th></tr></thead>
+                                <tbody>
+                                    <tr><td><strong>אודיו</strong></td><td>15</td><td>10</td><td>4</td><td>1</td><td>0</td><td><span class="badge badge-green">73%</span></td></tr>
+                                    <tr><td><strong>כבלים</strong></td><td>20</td><td>15</td><td>4</td><td>1</td><td>0</td><td><span class="badge badge-yellow">80%</span></td></tr>
+                                    <tr><td><strong>תמיכה</strong></td><td>8</td><td>2</td><td>6</td><td>0</td><td>0</td><td><span class="badge badge-red">25%</span></td></tr>
+                                    <tr><td><strong>אחר</strong></td><td>2</td><td>1</td><td>0</td><td>1</td><td>0</td><td><span class="badge badge-blue">50%</span></td></tr>
+                                    <tr style="font-weight:600; background:var(--bg)"><td>סה"כ</td><td>45</td><td>28</td><td>14</td><td>3</td><td>0</td><td><span class="badge badge-yellow">62%</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="admin-reports" class="tab-content">
+                    <div class="page-title">
+                        <h2>📈 דוחות</h2>
+                        <p>ניתוח נתונים ומגמות</p>
+                    </div>
+                    <div class="alert alert-info">ℹ️ <strong>שטח מנהל בלבד:</strong> דוחות מפורטים על פעילות המערכת.</div>
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-title">📅 פעילות חודש מרץ 2026</div>
+                            <table><tbody>
+                                <tr><td>שליחות</td><td><strong>45</strong></td></tr>
+                                <tr><td>קבלות</td><td><strong>40</strong></td></tr>
+                                <tr><td>דוחות נזק</td><td><strong>3</strong></td></tr>
+                                <tr><td>ציוד חדש נוסף</td><td><strong>2</strong></td></tr>
+                            </tbody></table>
+                        </div>
+                        <div class="card">
+                            <div class="card-title">👥 משתמשים פעילים</div>
+                            <table><tbody>
+                                <tr><td>שי בר</td><td><strong>15 פעולות</strong></td></tr>
+                                <tr><td>דויד כהן</td><td><strong>12 פעולות</strong></td></tr>
+                                <tr><td>שרה דוד</td><td><strong>8 פעולות</strong></td></tr>
+                                <tr><td>יוסי לוי</td><td><strong>5 פעולות</strong></td></tr>
+                            </tbody></table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Checkout Modal -->
+<div id="checkout-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>📤 שליחת ציוד</h3>
+        <div class="form-group"><label>בחר ציוד</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>מעמד מיקרופון</option><option>כבל XLR 5מ׳</option><option>רמקול JBL קטן</option></select></div>
+        <div class="form-group"><label>תאריך החזרה</label><input type="date" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label>הערות</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="הערות אופציונליות..."></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('checkout-modal')">ביטול</button>
+            <button class="btn btn-primary" onclick="showSuccess('הציוד נשלח בהצלחה!'); closeModal('checkout-modal')">📤 שלח ציוד</button>
+        </div>
+    </div>
+</div>
+
+<!-- Checkin Modal -->
+<div id="checkin-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>📥 החזרת ציוד</h3>
+        <div class="form-group"><label>בחר ציוד להחזרה</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>מיקרופון Shure SM58</option><option>כבל XLR 5מ׳</option><option>רמקול JBL נייד</option></select></div>
+        <div class="form-group"><label>מצב הציוד</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>תקין</option><option>סביר</option><option>ניזוק</option></select></div>
+        <div class="form-group"><label>הערות</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="תאר את מצב הציוד..."></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('checkin-modal')">ביטול</button>
+            <button class="btn btn-success" onclick="showSuccess('הציוד הוחזר בהצלחה!'); closeModal('checkin-modal')">📥 החזר ציוד</button>
+        </div>
+    </div>
+</div>
+
+<!-- Damage Modal -->
+<div id="damage-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>⚠️ דיווח נזק</h3>
+        <div class="form-group"><label>בחר ציוד</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>מיקרופון Shure SM58</option><option>כבל XLR 5מ׳</option><option>רמקול JBL נייד</option></select></div>
+        <div class="form-group"><label>תיאור הנזק</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="תאר את הנזק בפירוט..."></textarea></div>
+        <div class="form-group"><label>חומרת הנזק</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>קל</option><option>בינוני</option><option>חמור</option></select></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('damage-modal')">ביטול</button>
+            <button class="btn btn-danger" onclick="showSuccess('דוח הנזק נשלח למנהל!'); closeModal('damage-modal')">⚠️ שלח דוח</button>
+        </div>
+    </div>
+</div>
+
+<!-- Task Modal -->
+<div id="task-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>➕ משימה חדשה</h3>
+        <div class="form-group"><label>כותרת</label><input type="text" placeholder="כותרת המשימה..." style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label>תיאור</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px" placeholder="תאר את המשימה..."></textarea></div>
+        <div class="form-group"><label>עדיפות</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>גבוה</option><option>בינוני</option><option>נמוך</option></select></div>
+        <div class="form-group"><label>תאריך יעד</label><input type="date" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('task-modal')">ביטול</button>
+            <button class="btn btn-primary" onclick="showSuccess('המשימה נוצרה בהצלחה!'); closeModal('task-modal')">✅ צור משימה</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Equipment Modal -->
+<div id="add-equipment-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>📦 הוסף ציוד חדש</h3>
+        <div class="form-group"><label>שם הציוד</label><input type="text" placeholder="למ' מיקרופון Shure SM58" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label>קטגוריה</label><select style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"><option>אודיו</option><option>תמיכה</option><option>כבלים</option><option>אחר</option></select></div>
+        <div class="form-group"><label>Serial Number</label><input type="text" placeholder="MIC-001" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label>תיאור</label><textarea style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem;resize:vertical;min-height:80px"></textarea></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('add-equipment-modal')">ביטול</button>
+            <button class="btn btn-primary" onclick="showSuccess('הציוד נוסף למערכת!'); closeModal('add-equipment-modal')">➕ הוסף ציוד</button>
+        </div>
+    </div>
+</div>
+
+<!-- Add User Modal -->
+<div id="add-user-modal" class="modal-overlay">
+    <div class="modal">
+        <h3>👤 הוסף משתמש חדש</h3>
+        <div class="form-group"><label>שם משתמש</label><input type="text" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label>שם מלא</label><input type="text" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label>דוא"ל</label><input type="email" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label>סיסמה</label><input type="password" style="width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:0.5rem;font-size:0.9rem"></div>
+        <div class="form-group"><label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer"><input type="checkbox"> הנפק כמנהל מערכת</label></div>
+        <div class="modal-actions">
+            <button class="btn btn-ghost" onclick="closeModal('add-user-modal')">ביטול</button>
+            <button class="btn btn-primary" onclick="showSuccess('המשתמש נוצר בהצלחה!'); closeModal('add-user-modal')">➕ צור משתמש</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Toast -->
+<div id="toast" style="position:fixed;bottom:2rem;right:2rem;background:#065f46;color:white;padding:1rem 1.5rem;border-radius:0.75rem;box-shadow:var(--shadow-lg);font-weight:500;display:none;z-index:999;animation:slideIn 0.3s ease">
+    ✅ <span id="toast-msg"></span>
+</div>
+
+<style>
+@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+</style>
+
+<script>
+    const USERS = {
+        'admin': { password: 'admin123', isAdmin: true, fullName: 'מנהל מערכת' },
+        'user': { password: '1234', isAdmin: false, fullName: 'שי בר' }
+    };
+
+    let currentUser = null;
+
+    function doLogin() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        const errorEl = document.getElementById('login-error');
+
+        errorEl.style.display = 'none';
+
+        const user = USERS[username];
+        if (!user || user.password !== password) {
+            errorEl.style.display = 'block';
+            return;
+        }
+
+        currentUser = { username, ...user };
+
+        if (user.isAdmin) {
+            showScreen('admin-screen');
+        } else {
+            document.getElementById('user-name-display').textContent = username;
+            document.getElementById('user-avatar').textContent = username[0].toUpperCase();
+            document.getElementById('user-greeting').textContent = user.fullName + '!';
+            showScreen('user-screen');
+        }
+    }
+
+    function doLogout() {
+        currentUser = null;
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        showScreen('login-screen');
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+    }
+
+    function showUserTab(tabName) {
+        document.querySelectorAll('#user-screen .tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById('user-' + tabName).classList.add('active');
+        document.querySelectorAll('#user-screen .navbar-links a').forEach(a => a.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function showAdminTab(tabId) {
+        document.querySelectorAll('#admin-screen .tab-content').forEach(t => t.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('open');
+        });
+    });
+
+    // Enter key login
+    document.getElementById('password').addEventListener('keydown', e => {
+        if (e.key === 'Enter') doLogin();
+    });
+
+    function showSuccess(msg) {
+        const toast = document.getElementById('toast');
+        document.getElementById('toast-msg').textContent = msg;
+        toast.style.display = 'block';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+</script>
+</body>
+</html>
