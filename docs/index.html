@@ -23,7 +23,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* PIN PAD */
 #pin-section{display:none}
 .pin-display{text-align:center;font-size:2rem;letter-spacing:.5rem;margin-bottom:1rem;min-height:2.5rem;color:var(--primary);font-weight:700}
-.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;max-width:220px;margin:0 auto}
+.pin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;max-width:220px;margin:0 auto;direction:ltr}
 .pin-btn{background:var(--bg);border:1.5px solid var(--border);border-radius:.75rem;padding:.8rem;font-size:1.1rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
 .pin-btn:hover{background:#eff6ff;border-color:var(--primary)}
 .pin-btn.wide{grid-column:span 2}
@@ -348,8 +348,8 @@ tbody tr:hover{background:#f8fafc}
     <!-- USERS -->
     <div id="a-users" class="tab-content">
       <div class="page-title"><h2>👥 ניהול משתמשים</h2></div>
-      <div style="margin-bottom:.9rem"><button class="btn btn-primary btn-sm btn-inline" onclick="openModal('add-user-modal')">➕ הוסף עובד</button></div>
-      <div class="card"><div class="table-wrap"><table><thead><tr><th>שם משתמש</th><th>שם מלא</th><th>קוד PIN</th><th>ציוד</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody id="a-users-table"></tbody></table></div></div>
+      <div style="margin-bottom:.9rem"><button class="btn btn-primary btn-sm btn-inline" onclick="openModal('add-user-modal')">➕ הוסף עובד / מנהל</button></div>
+      <div class="card"><div class="card-title">👷 עובדים</div><div class="table-wrap"><table><thead><tr><th>שם מלא</th><th>טלפון</th><th>קוד PIN</th><th>ציוד</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody id="a-users-table"></tbody></table></div></div>
     </div>
 
     <!-- TASKS -->
@@ -434,6 +434,16 @@ tbody tr:hover{background:#f8fafc}
       </div>
 
       <div class="settings-section">
+        <h3>👨‍💼 הגדרות חשבון מנהל</h3>
+        <div class="form-group"><label>שינוי סיסמת מנהל</label><input type="password" id="admin-new-pw" style="width:100%" placeholder="סיסמה חדשה"></div>
+        <div class="form-group"><label>אימות סיסמה</label><input type="password" id="admin-new-pw2" style="width:100%" placeholder="הכנס שוב"></div>
+        <button class="btn btn-warning btn-inline" onclick="changeAdminPw()">🔐 שנה סיסמה</button>
+        <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border)">
+        <div style="font-weight:600;margin-bottom:.5rem;font-size:.88rem">מנהלים במערכת</div>
+        <div id="admins-list"></div>
+      </div>
+
+      <div class="settings-section">
         <h3>🔒 הרשאות מערכת</h3>
         <div id="perms-list"></div>
         <button class="btn btn-primary btn-inline" style="margin-top:.9rem" onclick="savePermissions()">💾 שמור הרשאות</button>
@@ -467,10 +477,10 @@ tbody tr:hover{background:#f8fafc}
 
 <div id="add-user-modal" class="modal-overlay"><div class="modal">
   <h3>👤 הוסף עובד חדש</h3>
-  <div class="form-group"><label>שם משתמש</label><input type="text" id="nu-username" style="width:100%" placeholder="username"></div>
   <div class="form-group"><label>שם מלא</label><input type="text" id="nu-fullname" style="width:100%" placeholder="ישראל ישראלי"></div>
-  <div class="form-group"><label>סיסמה</label><input type="password" id="nu-password" style="width:100%"></div>
-  <div class="form-group"><label>קוד PIN (4 ספרות)</label><input type="text" id="nu-pin" style="width:100%" placeholder="1234" maxlength="4"></div>
+  <div class="form-group"><label>מספר טלפון (אופציונלי)</label><input type="tel" id="nu-phone" style="width:100%" placeholder="050-0000000"></div>
+  <div class="form-group"><label>קוד PIN (4 ספרות) — בו יכנס לכרטיס שלו</label><input type="text" id="nu-pin" style="width:100%;direction:ltr;letter-spacing:.3rem;font-size:1.1rem" placeholder="1234" maxlength="4" inputmode="numeric"></div>
+  <div class="form-group"><label>תפקיד</label><select id="nu-role" style="width:100%"><option value="worker">עובד</option><option value="admin">מנהל</option></select></div>
   <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('add-user-modal')">ביטול</button><button class="btn btn-primary btn-inline" onclick="addUser()">➕ הוסף</button></div>
 </div></div>
 
@@ -718,8 +728,8 @@ function renderAdminUsers(){
     const eqc=equipment.filter(e=>e.holder===u.fullName).length;
     const sb=u.active?'<span class="badge badge-green">✓ פעיל</span>':'<span class="badge badge-red">✗ מושבת</span>';
     const tb2=u.active?`<button class="btn btn-danger btn-sm" onclick="toggleUser(${u.id})">🚫 השבת</button>`:`<button class="btn btn-success btn-sm" onclick="toggleUser(${u.id})">✓ הפעל</button>`;
-    return `<tr><td><strong>${u.username}</strong></td><td>${u.fullName}</td><td>${u.pin||'—'}</td><td>${eqc}</td><td>${sb}</td><td>${tb2}</td></tr>`;
-  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין עובדים. הוסף עובדים בהגדרות.</td></tr>';
+    return `<tr><td><strong>${u.fullName}</strong></td><td>${u.phone||'—'}</td><td style="direction:ltr;text-align:center">${u.pin||'—'}</td><td>${eqc}</td><td>${sb}</td><td>${tb2}</td></tr>`;
+  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין עובדים. לחץ ➕ הוסף עובד.</td></tr>';
 }
 function renderAdminTasks(){
   const tb=document.getElementById('a-tasks-table');
@@ -758,7 +768,7 @@ function renderAdminReports(){
 function renderSettings(){
   document.getElementById('set-sys-name').value=systemSettings.name;
   document.getElementById('set-company').value=systemSettings.company;
-  renderCats();renderPinTable();renderEmpCards();renderPerms();
+  renderCats();renderPinTable();renderEmpCards();renderPerms();renderAdminsList();
 }
 function saveSystemSettings(){
   systemSettings.name=document.getElementById('set-sys-name').value.trim()||'מערכת ניהול ציוד';
@@ -825,6 +835,23 @@ function renderPerms(){
     {key:'historyVisible',label:'היסטוריית פעולות גלויה לעובדים'},
   ];
   el.innerHTML=permsConfig.map(p=>`<div class="perm-row"><label>${p.label}</label><label class="toggle"><input type="checkbox" id="perm-${p.key}" ${permissions[p.key]?'checked':''}><span class="toggle-slider"></span></label></div>`).join('');
+}
+function changeAdminPw(){
+  const pw=document.getElementById('admin-new-pw').value;
+  const pw2=document.getElementById('admin-new-pw2').value;
+  if(!pw){alert('יש להזין סיסמה');return;}
+  if(pw!==pw2){alert('הסיסמאות לא תואמות');return;}
+  if(pw.length<4){alert('סיסמה קצרה מדי (מינימום 4 תווים)');return;}
+  currentUser.password=pw;
+  document.getElementById('admin-new-pw').value='';
+  document.getElementById('admin-new-pw2').value='';
+  showToast('הסיסמה שונתה בהצלחה ✅');
+}
+function renderAdminsList(){
+  const el=document.getElementById('admins-list');
+  if(!el)return;
+  const admins=USERS.filter(u=>u.isAdmin);
+  el.innerHTML=admins.map(u=>`<div style="display:flex;align-items:center;gap:.6rem;padding:.4rem .6rem;background:var(--bg);border-radius:.4rem;margin-bottom:.3rem"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),#be185d);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700">${u.fullName[0]}</div><span style="font-size:.88rem;font-weight:600">${u.fullName}</span><span class="badge badge-purple" style="margin-right:auto">מנהל</span></div>`).join('');
 }
 function savePermissions(){
   ['canReportDamage','canCheckout','canCheckin','historyVisible'].forEach(k=>{
@@ -898,15 +925,17 @@ document.getElementById('add-eq-modal').addEventListener('click',()=>{});
 
 // ===== USERS =====
 function addUser(){
-  const u=document.getElementById('nu-username').value.trim();
   const fn=document.getElementById('nu-fullname').value.trim();
-  const pw=document.getElementById('nu-password').value;
   const pin=document.getElementById('nu-pin').value.trim();
-  if(!u||!fn||!pw){alert('יש למלא את כל השדות');return;}
-  if(USERS.find(x=>x.username===u)){alert('שם משתמש כבר קיים');return;}
-  if(pin&&!/^\d{4}$/.test(pin)){alert('קוד PIN חייב להיות 4 ספרות');return;}
-  USERS.push({id:nid.user++,username:u,password:pw,pin,isAdmin:false,fullName:fn,active:true});
-  ['nu-username','nu-fullname','nu-password','nu-pin'].forEach(id=>document.getElementById(id).value='');
+  const phone=document.getElementById('nu-phone').value.trim();
+  const role=document.getElementById('nu-role').value;
+  if(!fn){alert('יש להזין שם מלא');return;}
+  if(!pin||!/^\d{4}$/.test(pin)){alert('קוד PIN חייב להיות 4 ספרות');return;}
+  if(USERS.find(x=>x.pin===pin)){alert('קוד PIN זה כבר קיים, בחר קוד אחר');return;}
+  const isAdmin=role==='admin';
+  const username='user_'+nid.user;
+  USERS.push({id:nid.user++,username,password:pin,pin,isAdmin,fullName:fn,phone,active:true});
+  ['nu-fullname','nu-phone','nu-pin'].forEach(id=>document.getElementById(id).value='');
   closeModal('add-user-modal');renderAdminUsers();renderAdminOverview();showToast('העובד נוסף ✅');
 }
 function toggleUser(id){
