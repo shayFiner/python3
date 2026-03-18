@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./equipment.db:/app/equipment.db
+    environment:
+      - SECRET_KEY=change-this-in-production
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+    command: python run.py
