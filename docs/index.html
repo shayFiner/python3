@@ -115,15 +115,30 @@ tbody tr:hover{background:#f8fafc}
 .settings-section{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:1.25rem;margin-bottom:1.1rem}
 .settings-section h3{font-size:1rem;font-weight:700;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border)}
 /* EMPLOYEE CARD */
-#employee-card-screen{background:linear-gradient(135deg,#1e3a8a,#7c3aed);align-items:center;justify-content:flex-start;padding:1rem}
-.emp-card{background:#fff;border-radius:1.5rem;padding:1.75rem;width:100%;max-width:500px;margin:0 auto;box-shadow:0 25px 50px rgba(0,0,0,.25)}
-.emp-header{text-align:center;margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border)}
-.emp-avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;margin:0 auto .75rem}
-.emp-name{font-size:1.3rem;font-weight:700}
+#employee-card-screen{background:linear-gradient(135deg,#1e3a8a,#7c3aed);align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto}
+.emp-card{background:#fff;border-radius:1.5rem;padding:1.5rem;width:100%;max-width:500px;margin:0 auto;box-shadow:0 25px 50px rgba(0,0,0,.25)}
+.emp-header{text-align:center;margin-bottom:1.2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.emp-avatar{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:700;margin:0 auto .6rem}
+.emp-name{font-size:1.25rem;font-weight:700}
 .emp-section{margin-bottom:1.2rem}
 .emp-section-title{font-size:.88rem;font-weight:700;color:var(--text-light);margin-bottom:.65rem;text-transform:uppercase;letter-spacing:.03em}
 .emp-eq-item{display:flex;align-items:center;justify-content:space-between;padding:.6rem .8rem;background:var(--bg);border-radius:.5rem;margin-bottom:.4rem}
 .emp-task-item{padding:.6rem .8rem;background:var(--bg);border-radius:.5rem;margin-bottom:.4rem}
+/* EMP TABS */
+.emp-tabs{display:flex;gap:.3rem;margin-bottom:1rem;background:var(--bg);border-radius:.6rem;padding:.3rem}
+.emp-tab-btn{flex:1;padding:.45rem;border:none;background:transparent;border-radius:.4rem;cursor:pointer;font-size:.82rem;font-weight:600;font-family:inherit;color:var(--text-light);transition:all .15s}
+.emp-tab-btn.active{background:#fff;color:var(--primary);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.ec-tab{display:none}.ec-tab.active{display:block}
+/* MOBILE BOTTOM NAV */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);z-index:200;padding:.4rem 0}
+.mobile-bottom-nav ul{list-style:none;display:flex;justify-content:space-around}
+.mobile-bottom-nav a{display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.65rem;color:var(--text-light);cursor:pointer;padding:.2rem .5rem;border-radius:.4rem;transition:color .15s}
+.mobile-bottom-nav a.active,.mobile-bottom-nav a:hover{color:var(--primary)}
+.mobile-bottom-nav .nav-icon{font-size:1.25rem}
+@media(max-width:768px){
+  .mobile-bottom-nav{display:block}
+  #user-screen .main-content{padding-bottom:4.5rem}
+}
 /* CHAT */
 .chat-layout{display:flex;gap:1rem;height:500px}
 .chat-sidebar{width:180px;flex-shrink:0;border:1px solid var(--border);border-radius:.75rem;overflow-y:auto}
@@ -205,21 +220,36 @@ tbody tr:hover{background:#f8fafc}
 <!-- EMPLOYEE CARD -->
 <div id="employee-card-screen" class="screen">
 <div class="emp-card">
-  <div style="display:flex;justify-content:flex-start;margin-bottom:1rem">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
     <button class="btn btn-ghost btn-sm" onclick="doLogout()">← יציאה</button>
+    <span style="font-size:.75rem;color:var(--text-light)" id="ec-company">אינדורסקי הפקות</span>
   </div>
   <div class="emp-header">
     <div class="emp-avatar" id="ec-avatar">?</div>
     <div class="emp-name" id="ec-name"></div>
     <span class="badge badge-blue" style="margin-top:.3rem">עובד</span>
+    <div id="ec-stats" style="display:flex;gap:.75rem;margin-top:.65rem;justify-content:center"></div>
   </div>
-  <div class="emp-section">
-    <div class="emp-section-title">📦 הציוד שלי</div>
+  <div class="emp-tabs">
+    <button class="emp-tab-btn active" onclick="showEmpTab('eq',this)">📦 ציוד</button>
+    <button class="emp-tab-btn" onclick="showEmpTab('tasks',this)">📋 משימות</button>
+    <button class="emp-tab-btn" onclick="showEmpTab('chat',this)">💬 צ'אט</button>
+  </div>
+  <div id="ec-tab-eq" class="ec-tab active">
     <div id="ec-equipment"><div style="color:var(--text-light);font-size:.85rem">אין ציוד אצלך כרגע</div></div>
   </div>
-  <div class="emp-section">
-    <div class="emp-section-title">📋 המשימות שלי</div>
+  <div id="ec-tab-tasks" class="ec-tab">
     <div id="ec-tasks"><div style="color:var(--text-light);font-size:.85rem">אין משימות פתוחות</div></div>
+  </div>
+  <div id="ec-tab-chat" class="ec-tab">
+    <div style="border:1px solid var(--border);border-radius:.75rem;overflow:hidden">
+      <div style="padding:.55rem .9rem;border-bottom:1px solid var(--border);font-weight:600;font-size:.85rem;background:var(--bg)">👥 קבוצה כללית</div>
+      <div class="chat-messages" style="height:220px" id="ec-chat-messages"></div>
+      <div class="chat-input-row">
+        <input type="text" id="ec-chat-input" placeholder="כתוב הודעה..." onkeydown="if(event.key==='Enter')sendEcChat()">
+        <button class="btn btn-primary btn-sm btn-inline" onclick="sendEcChat()">שלח</button>
+      </div>
+    </div>
   </div>
 </div>
 </div>
@@ -289,6 +319,16 @@ tbody tr:hover{background:#f8fafc}
     </div>
   </div>
 </div>
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-bottom-nav">
+  <ul>
+    <li><a class="active" id="mbn-dashboard" onclick="showUserTab('dashboard',null);mbnActive(this)"><span class="nav-icon">📊</span>דשבורד</a></li>
+    <li><a id="mbn-myequipment" onclick="showUserTab('myequipment',null);mbnActive(this)"><span class="nav-icon">📦</span>ציוד</a></li>
+    <li><a id="mbn-tasks" onclick="showUserTab('tasks',null);mbnActive(this)"><span class="nav-icon">📋</span>משימות</a></li>
+    <li><a id="mbn-history" onclick="showUserTab('history',null);mbnActive(this)"><span class="nav-icon">📈</span>היסטוריה</a></li>
+    <li><a id="mbn-chat" onclick="showUserTab('chat',null);mbnActive(this)"><span class="nav-icon">💬</span>צ'אט</a></li>
+  </ul>
+</nav>
 </div>
 
 <!-- ADMIN SCREEN -->
@@ -355,7 +395,10 @@ tbody tr:hover{background:#f8fafc}
     <!-- TASKS -->
     <div id="a-tasks" class="tab-content">
       <div class="page-title"><h2>📋 ניהול משימות</h2><p>צור משימות והקצה לעובדים</p></div>
-      <div style="margin-bottom:.9rem"><button class="btn btn-primary btn-sm btn-inline" onclick="openModal('add-task-modal');populateTaskUsers()">➕ משימה חדשה</button></div>
+      <div style="margin-bottom:.9rem;display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm btn-inline" onclick="openModal('add-task-modal');populateTaskUsers()">➕ משימה חדשה</button>
+        <button class="btn btn-ghost btn-sm" onclick="exportTasksExcel()">📊 ייצוא לאקסל</button>
+      </div>
       <div class="card"><div class="table-wrap"><table><thead><tr><th>משימה</th><th>מוקצה ל</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody id="a-tasks-table"></tbody></table></div></div>
     </div>
 
@@ -537,7 +580,6 @@ tbody tr:hover{background:#f8fafc}
 
 <script>
 // ===== DATA =====
-const DEFAULT_USERS = [{id:1,username:'admin',password:'admin123',pin:'',isAdmin:true,fullName:'מנהל מערכת',active:true}];
 const STORAGE_KEY = 'indorski_data';
 
 function saveData(){
@@ -548,7 +590,7 @@ function saveData(){
 function loadData(){
   try{
     const raw=localStorage.getItem(STORAGE_KEY);
-    if(!raw)return;
+    if(!raw){seedInitialData();return;}
     const d=JSON.parse(raw);
     if(d.USERS)USERS=d.USERS;
     if(d.equipment)equipment=d.equipment;
@@ -560,10 +602,45 @@ function loadData(){
     if(d.systemSettings)systemSettings=d.systemSettings;
     if(d.permissions)permissions=d.permissions;
     if(d.nid)nid=d.nid;
-  }catch(e){}
+  }catch(e){seedInitialData();}
+}
+function seedInitialData(){
+  USERS=[
+    {id:1,username:'admin',password:'admin123',pin:'',isAdmin:true,fullName:'מנהל מערכת',active:true},
+    {id:2,username:'user',password:'1234',pin:'1111',isAdmin:false,fullName:'שי בר',active:true},
+    {id:3,username:'david',password:'david123',pin:'2222',isAdmin:false,fullName:'דויד כהן',active:true},
+    {id:4,username:'sarah',password:'sarah123',pin:'3333',isAdmin:false,fullName:'שרה דוד',active:false},
+  ];
+  equipment=[
+    {id:1,name:'מיקרופון Shure SM58',category:'אודיו',sn:'MIC-001',status:'בשימוש',holder:'שי בר',desc:''},
+    {id:2,name:'מעמד מיקרופון',category:'תמיכה',sn:'STAND-001',status:'זמין',holder:'',desc:''},
+    {id:3,name:'כבל USB',category:'כבלים',sn:'CABLE-001',status:'ניזוק',holder:'',desc:''},
+    {id:4,name:'רמקול JBL נייד',category:'אודיו',sn:'SPEAKER-001',status:'בשימוש',holder:'שי בר',desc:''},
+    {id:5,name:'כבל XLR 5מ׳',category:'כבלים',sn:'XLR-001',status:'בשימוש',holder:'שי בר',desc:''},
+    {id:6,name:'רמקול JBL קטן',category:'אודיו',sn:'SPEAKER-002',status:'זמין',holder:'',desc:''},
+  ];
+  damageReports=[
+    {id:1,equipmentName:'כבל USB',reportedBy:'שי בר',desc:'חוט פנימי שבור',severity:'חמור',status:'בתיקון',date:'14/03/2026'},
+    {id:2,equipmentName:'מעמד מיקרופון',reportedBy:'דויד כהן',desc:'שריטה בחלק העליון',severity:'קל',status:'תוקן',date:'10/03/2026'},
+  ];
+  tasks=[
+    {id:1,title:'החזרת ציוד לאולם',desc:'להחזיר את כל הציוד לאולם ב׳',assignedTo:2,date:'20/03/2026',priority:'גבוה',status:'פתוח',notes:''},
+    {id:2,title:'בדיקת רמקולים',desc:'לבדוק שכל הרמקולים עובדים',assignedTo:3,date:'22/03/2026',priority:'בינוני',status:'פתוח',notes:''},
+    {id:3,title:'הזמנת כבלים',desc:'הזמין 5 כבלי XLR חדשים',assignedTo:2,date:'15/03/2026',priority:'נמוך',status:'הושלם',notes:''},
+  ];
+  history=[
+    {type:'שליחה',equipment:'מיקרופון Shure SM58',by:'שי בר',date:'18/03/2026 09:30',detail:'—'},
+    {type:'שליחה',equipment:'כבל XLR 5מ׳',by:'שי בר',date:'17/03/2026 14:15',detail:'—'},
+    {type:'קבלה',equipment:'מעמד מיקרופון',by:'דויד כהן',date:'15/03/2026 11:00',detail:'מצב: תקין'},
+    {type:'נזק',equipment:'כבל USB',by:'שי בר',date:'14/03/2026 16:45',detail:'חוט פנימי שבור'},
+    {type:'שליחה',equipment:'רמקול JBL נייד',by:'שי בר',date:'12/03/2026 08:20',detail:'—'},
+  ];
+  chatMessages=[];
+  nid={eq:7,task:4,dmg:3,chat:1,user:5};
+  saveData();
 }
 
-let USERS = [...DEFAULT_USERS];
+let USERS = [];
 let equipment = [];
 let categories = ['אודיו','תמיכה','כבלים','תאורה','וידאו','אחר'];
 let damageReports = [];
@@ -576,7 +653,7 @@ let nid = {eq:1,task:1,dmg:1,chat:1,user:2};
 let currentUser = null;
 let chatTarget = null;
 
-loadData(); // טען נתונים שמורים בטעינת הדף
+loadData();
 
 // ===== AUTH =====
 function doLogin(){
@@ -643,19 +720,48 @@ function updatePinDisplay(){
 function renderEmployeeCard(user){
   document.getElementById('ec-avatar').textContent=user.fullName[0];
   document.getElementById('ec-name').textContent=user.fullName;
+  document.getElementById('ec-company').textContent=systemSettings.company||'אינדורסקי הפקות';
   const myEq=equipment.filter(e=>e.holder===user.fullName);
-  const eqEl=document.getElementById('ec-equipment');
-  eqEl.innerHTML=myEq.length?myEq.map(e=>`<div class="emp-eq-item"><span>${e.name}</span><button class="btn btn-success btn-sm" onclick="ecCheckin(${e.id})">📥 החזר</button></div>`).join(''):'<div style="color:var(--text-light);font-size:.85rem">אין ציוד אצלך כרגע</div>';
   const myTasks=tasks.filter(t=>t.assignedTo===user.id&&t.status!=='הושלם');
-  const tkEl=document.getElementById('ec-tasks');
-  tkEl.innerHTML=myTasks.length?myTasks.map(t=>`<div class="emp-task-item"><strong>${t.title}</strong><br><span style="font-size:.8rem;color:var(--text-light)">${t.desc}</span><br><span class="badge ${t.priority==='גבוה'?'badge-red':t.priority==='בינוני'?'badge-blue':'badge-green'}">${t.priority}</span></div>`).join(''):'<div style="color:var(--text-light);font-size:.85rem">אין משימות פתוחות</div>';
+  // stats bar
+  document.getElementById('ec-stats').innerHTML=`
+    <span style="background:#eff6ff;border-radius:.4rem;padding:.2rem .5rem;color:var(--primary);font-weight:700;font-size:.8rem">📦 ${myEq.length} ציוד</span>
+    <span style="background:#fef9c3;border-radius:.4rem;padding:.2rem .5rem;color:#854d0e;font-weight:700;font-size:.8rem">📋 ${myTasks.length} משימות</span>`;
+  // equipment tab
+  document.getElementById('ec-equipment').innerHTML=myEq.length?myEq.map(e=>`<div class="emp-eq-item"><div><strong style="font-size:.88rem">${e.name}</strong><br><span style="font-size:.75rem;color:var(--text-light)">${e.category} | ${e.sn}</span></div><button class="btn btn-success btn-sm" onclick="ecCheckin(${e.id})">📥 החזר</button></div>`).join(''):'<div style="color:var(--text-light);font-size:.85rem;padding:.5rem">אין ציוד אצלך כרגע</div>';
+  // tasks tab
+  document.getElementById('ec-tasks').innerHTML=myTasks.length?myTasks.map(t=>`<div class="emp-task-item"><div style="display:flex;justify-content:space-between;align-items:flex-start"><strong style="font-size:.88rem">${t.title}</strong>${pBadge(t.priority)}</div><div style="font-size:.78rem;color:var(--text-light);margin:.25rem 0">${t.desc}</div><div style="font-size:.75rem;color:var(--text-light)">📅 ${t.date}</div></div>`).join(''):'<div style="color:var(--text-light);font-size:.85rem;padding:.5rem">אין משימות פתוחות</div>';
+  // chat
+  renderEcChat();
+}
+function showEmpTab(tab,el){
+  document.querySelectorAll('.ec-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('ec-tab-'+tab).classList.add('active');
+  document.querySelectorAll('.emp-tab-btn').forEach(b=>b.classList.remove('active'));
+  if(el)el.classList.add('active');
+  if(tab==='chat')renderEcChat();
+}
+function renderEcChat(){
+  const el=document.getElementById('ec-chat-messages');if(!el)return;
+  const msgs=chatMessages.filter(m=>m.toId===null);
+  el.innerHTML=msgs.length?msgs.map(m=>{
+    const mine=m.fromId===currentUser.id;
+    return `<div class="chat-msg ${mine?'mine':'theirs'}"><div class="chat-msg-sender">${mine?'אתה':m.fromName}</div>${m.text}<div style="font-size:.68rem;opacity:.6;margin-top:.2rem;text-align:${mine?'left':'right'}">${m.time}</div></div>`;
+  }).join(''):'<div style="text-align:center;color:var(--text-light);font-size:.85rem;padding:1.5rem 0">אין הודעות. שלח ראשון!</div>';
+  el.scrollTop=el.scrollHeight;
+}
+function sendEcChat(){
+  const inp=document.getElementById('ec-chat-input');
+  const text=inp.value.trim();if(!text||!currentUser)return;
+  chatMessages.push({id:nid.chat++,fromId:currentUser.id,toId:null,fromName:currentUser.fullName,text,time:nowStr()});
+  inp.value='';saveData();renderEcChat();
 }
 function ecCheckin(eqId){
   const e=equipment.find(x=>x.id===eqId);
   if(!e)return;
   e.status='זמין';e.holder='';
   history.push({type:'קבלה',equipment:e.name,by:currentUser.fullName,date:nowStr(),detail:'מצב: תקין'});
-  renderEmployeeCard(currentUser);
+  renderEmployeeCard(currentUser);saveData();
   showToast(e.name+' הוחזר ✅');
 }
 
@@ -666,6 +772,9 @@ function showUserTab(tab,el){
   document.getElementById('user-'+tab).classList.add('active');
   document.querySelectorAll('#user-screen .navbar-links a').forEach(a=>a.classList.remove('active'));
   if(el)el.classList.add('active');
+  // sync mobile nav
+  document.querySelectorAll('.mobile-bottom-nav a').forEach(a=>a.classList.remove('active'));
+  const mbn=document.getElementById('mbn-'+tab);if(mbn)mbn.classList.add('active');
   if(tab==='chat')renderChatUI('user');
 }
 function showAdminTab(tab,el){
@@ -800,7 +909,7 @@ function saveSystemSettings(){
   systemSettings.name=document.getElementById('set-sys-name').value.trim()||'מערכת ניהול ציוד';
   systemSettings.company=document.getElementById('set-company').value.trim()||'אינדורסקי הפקות';
   document.getElementById('sys-name-admin').textContent=systemSettings.name;
-  showToast('ההגדרות נשמרו ✅');
+  saveData();showToast('ההגדרות נשמרו ✅');
 }
 function renderCats(){
   const el=document.getElementById('cats-list');
@@ -810,11 +919,11 @@ function addCategory(){
   const v=document.getElementById('new-cat-input').value.trim();
   if(!v)return;
   if(categories.includes(v)){showToast('קטגוריה כבר קיימת');return;}
-  categories.push(v);document.getElementById('new-cat-input').value='';renderCats();showToast('קטגוריה נוספה ✅');
+  categories.push(v);document.getElementById('new-cat-input').value='';saveData();renderCats();showToast('קטגוריה נוספה ✅');
 }
 function deleteCat(i){
   if(!confirm(`למחוק קטגוריה "${categories[i]}"?`))return;
-  categories.splice(i,1);renderCats();showToast('קטגוריה נמחקה ✅');
+  categories.splice(i,1);saveData();renderCats();showToast('קטגוריה נמחקה ✅');
 }
 function renderPinTable(){
   const tb=document.getElementById('pin-table');
@@ -824,7 +933,7 @@ function savePin(uid){
   const u=USERS.find(x=>x.id===uid);if(!u)return;
   const v=document.getElementById('pin-'+uid).value.trim();
   if(v&&!/^\d{4}$/.test(v)){showToast('קוד PIN חייב להיות 4 ספרות');return;}
-  u.pin=v;renderPinTable();showToast(`PIN של ${u.fullName} עודכן ✅`);
+  u.pin=v;saveData();renderPinTable();showToast(`PIN של ${u.fullName} עודכן ✅`);
 }
 function renderEmpCards(){
   const el=document.getElementById('emp-cards-grid');
@@ -901,7 +1010,7 @@ function savePermissions(){
   ['canReportDamage','canCheckout','canCheckin','historyVisible'].forEach(k=>{
     const el=document.getElementById('perm-'+k);if(el)permissions[k]=el.checked;
   });
-  showToast('ההרשאות נשמרו ✅');
+  saveData();showToast('ההרשאות נשמרו ✅');
 }
 
 // ===== EQUIPMENT =====
@@ -929,20 +1038,20 @@ function saveEditEq(){
   e.status=document.getElementById('eeq-status').value;
   e.desc=document.getElementById('eeq-desc').value.trim();
   if(e.status!=='בשימוש')e.holder='';
-  closeModal('edit-eq-modal');renderAdminEq();renderAdminInventory();renderAdminOverview();showToast('הציוד עודכן ✅');
+  closeModal('edit-eq-modal');renderAdminEq();renderAdminInventory();renderAdminOverview();saveData();showToast('הציוד עודכן ✅');
 }
 function deleteEq(id){
   const e=equipment.find(x=>x.id===id);if(!e)return;
   if(!confirm(`למחוק "${e.name}"?`))return;
   equipment=equipment.filter(x=>x.id!==id);
-  renderAdminEq();renderAdminInventory();renderAdminOverview();showToast('הציוד נמחק ✅');
+  renderAdminEq();renderAdminInventory();renderAdminOverview();saveData();showToast('הציוד נמחק ✅');
 }
 function addEquipment(){
   const name=document.getElementById('neq-name').value.trim();
   if(!name){alert('יש להזין שם ציוד');return;}
   equipment.push({id:nid.eq++,name,category:document.getElementById('neq-cat').value,sn:document.getElementById('neq-sn').value.trim(),status:'זמין',holder:'',desc:document.getElementById('neq-desc').value.trim()});
   ['neq-name','neq-sn','neq-desc'].forEach(id=>document.getElementById(id).value='');
-  closeModal('add-eq-modal');renderAdminEq();renderAdminInventory();renderAdminOverview();showToast('הציוד נוסף ✅');
+  closeModal('add-eq-modal');renderAdminEq();renderAdminInventory();renderAdminOverview();saveData();showToast('הציוד נוסף ✅');
 }
 function importCSV(){document.getElementById('csv-input').click();}
 function handleCSV(inp){
@@ -956,7 +1065,7 @@ function handleCSV(inp){
       const p=l.split(',').map(x=>x.trim().replace(/^"|"$/g,''));
       if(p[0]){{equipment.push({id:nid.eq++,name:p[0],category:p[1]||'אחר',sn:p[2]||'',status:'זמין',holder:'',desc:''});added++;}}
     });
-    inp.value='';renderAdminEq();renderAdminInventory();renderAdminOverview();showToast(`יובאו ${added} פריטים ✅`);
+    inp.value='';saveData();renderAdminEq();renderAdminInventory();renderAdminOverview();showToast(`יובאו ${added} פריטים ✅`);
   };r.readAsText(f,'UTF-8');
 }
 function exportCSV(){
@@ -980,11 +1089,11 @@ function addUser(){
   const username='user_'+nid.user;
   USERS.push({id:nid.user++,username,password:pin,pin,isAdmin,fullName:fn,phone,active:true});
   ['nu-fullname','nu-phone','nu-pin'].forEach(id=>document.getElementById(id).value='');
-  closeModal('add-user-modal');renderAdminUsers();renderAdminOverview();showToast('העובד נוסף ✅');
+  closeModal('add-user-modal');renderAdminUsers();renderAdminOverview();saveData();showToast('העובד נוסף ✅');
 }
 function toggleUser(id){
   const u=USERS.find(x=>x.id===id);if(!u)return;
-  u.active=!u.active;renderAdminUsers();renderAdminOverview();showToast(u.active?u.fullName+' הופעל ✅':u.fullName+' הושבת ✅');
+  u.active=!u.active;renderAdminUsers();renderAdminOverview();saveData();showToast(u.active?u.fullName+' הופעל ✅':u.fullName+' הושבת ✅');
 }
 
 // ===== TASKS =====
@@ -1000,11 +1109,11 @@ function addTask(){
   const date=document.getElementById('nt-date').value;
   tasks.push({id:nid.task++,title,desc:document.getElementById('nt-desc').value.trim(),assignedTo:assignee,date:date?date.split('-').reverse().join('/'):today(),priority:document.getElementById('nt-priority').value,status:'פתוח',notes:''});
   ['nt-title','nt-desc','nt-date'].forEach(id=>document.getElementById(id).value='');
-  closeModal('add-task-modal');renderAdminTasks();renderAdminOverview();showToast('המשימה נוצרה ✅');
+  closeModal('add-task-modal');renderAdminTasks();renderAdminOverview();saveData();showToast('המשימה נוצרה ✅');checkTasksAutoExport();
 }
 function deleteTask(id){
   if(!confirm('למחוק משימה זו?'))return;
-  tasks=tasks.filter(x=>x.id!==id);renderAdminTasks();renderAdminOverview();showToast('המשימה נמחקה ✅');
+  tasks=tasks.filter(x=>x.id!==id);renderAdminTasks();renderAdminOverview();saveData();showToast('המשימה נמחקה ✅');
 }
 function openEditTask(id){
   const t=tasks.find(x=>x.id===id);if(!t)return;
@@ -1018,7 +1127,7 @@ function saveEditTask(){
   const t=tasks.find(x=>x.id===id);if(!t)return;
   t.status=document.getElementById('et-status').value;
   t.notes=document.getElementById('et-notes').value.trim();
-  closeModal('edit-task-modal');renderUserTasks();renderUserStats();showToast('המשימה עודכנה ✅');
+  closeModal('edit-task-modal');renderUserTasks();renderUserStats();saveData();showToast('המשימה עודכנה ✅');
 }
 
 // ===== DAMAGE =====
@@ -1027,13 +1136,13 @@ function markFixed(id){
   d.status='תוקן';
   const e=equipment.find(x=>x.name===d.equipmentName);
   if(e&&e.status==='ניזוק')e.status='זמין';
-  renderAdminDamage();renderAdminEq();renderAdminOverview();showToast('סומן כתוקן ✅');
+  renderAdminDamage();renderAdminEq();renderAdminOverview();saveData();showToast('סומן כתוקן ✅');
 }
 function scrapDmg(id){
   const d=damageReports.find(x=>x.id===id);if(!d)return;
   if(!confirm(`לגרוט דוח נזק על "${d.equipmentName}"?`))return;
   damageReports=damageReports.filter(x=>x.id!==id);
-  renderAdminDamage();renderAdminOverview();showToast('הדוח הוסר ✅');
+  renderAdminDamage();renderAdminOverview();saveData();showToast('הדוח הוסר ✅');
 }
 function showDmgDetails(id){
   const d=damageReports.find(x=>x.id===id);if(!d)return;
@@ -1069,7 +1178,7 @@ function doCheckout(){
   const e=equipment.find(x=>x.id===id);if(!e||!currentUser)return;
   e.status='בשימוש';e.holder=currentUser.fullName;
   history.push({type:'שליחה',equipment:e.name,by:currentUser.fullName,date:nowStr(),detail:'—'});
-  closeModal('checkout-modal');renderUser();showToast(e.name+' נשלח ✅');
+  closeModal('checkout-modal');renderUser();saveData();showToast(e.name+' נשלח ✅');
 }
 function doCheckin(){
   if(!permissions.canCheckin&&!currentUser.isAdmin){showToast('אין הרשאה להחזרת ציוד');return;}
@@ -1078,7 +1187,7 @@ function doCheckin(){
   const e=equipment.find(x=>x.id===id);if(!e)return;
   e.status=cond==='ניזוק'?'ניזוק':'זמין';e.holder='';
   history.push({type:'קבלה',equipment:e.name,by:currentUser.fullName,date:nowStr(),detail:'מצב: '+cond});
-  closeModal('checkin-modal');renderUser();showToast(e.name+' הוחזר ✅');
+  closeModal('checkin-modal');renderUser();saveData();showToast(e.name+' הוחזר ✅');
 }
 function doDamage(){
   if(!permissions.canReportDamage&&!currentUser.isAdmin){showToast('אין הרשאה לדיווח נזק');return;}
@@ -1090,7 +1199,7 @@ function doDamage(){
   damageReports.push({id:nid.dmg++,equipmentName:e.name,reportedBy:currentUser.fullName,desc,severity:sev,status:'בתיקון',date:today()});
   history.push({type:'נזק',equipment:e.name,by:currentUser.fullName,date:nowStr(),detail:desc});
   document.getElementById('dm-desc').value='';
-  closeModal('damage-modal');renderUser();showToast('דוח נזק נשלח ✅');
+  closeModal('damage-modal');renderUser();saveData();showToast('דוח נזק נשלח ✅');
 }
 
 // ===== CHAT =====
@@ -1127,7 +1236,7 @@ function sendChat(mode){
   const inp=mode==='user'?document.getElementById('u-chat-input'):document.getElementById('a-chat-input');
   const text=inp.value.trim();if(!text||!currentUser)return;
   chatMessages.push({id:nid.chat++,fromId:currentUser.id,toId:activeChatTarget,fromName:currentUser.fullName,text,time:nowStr()});
-  inp.value='';renderChatMessages(mode);
+  inp.value='';saveData();renderChatMessages(mode);
 }
 
 // ===== ADD EQ MODAL WITH CATS =====
@@ -1139,6 +1248,29 @@ openModal=function(id){
   if(id==='add-eq-modal')populateCatSelect('neq-cat');
   if(id==='edit-eq-modal'){}
 };
+
+// ===== MOBILE NAV =====
+function mbnActive(el){
+  document.querySelectorAll('.mobile-bottom-nav a').forEach(a=>a.classList.remove('active'));
+  if(el)el.classList.add('active');
+}
+
+// ===== TASKS EXPORT / AUTO-EXPORT =====
+function exportTasksExcel(){
+  const rows=['"#","כותרת","תיאור","מוקצה ל","תאריך","עדיפות","סטטוס","הערות"'];
+  tasks.forEach((t,i)=>rows.push(`"${i+1}","${t.title}","${t.desc}","${userName(t.assignedTo)}","${t.date}","${t.priority}","${t.status}","${t.notes||''}"`));
+  const csv=rows.join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`tasks_${today().replace(/\//g,'-')}.csv`;a.click();
+  showToast('משימות יוצאו לאקסל ✅');
+}
+function checkTasksAutoExport(){
+  const open=tasks.filter(t=>t.status!=='הושלם').length;
+  if(open>=15){
+    const msg=`יש לך ${open} משימות פתוחות! כדאי לייצא לאקסל לניהול קל יותר.`;
+    if(confirm(msg+'\n\nלייצא עכשיו?'))exportTasksExcel();
+  }
+}
 
 // ===== KEYBOARD =====
 document.getElementById('password').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
