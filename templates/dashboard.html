@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דשבורד - מערכת ניהול הציוד</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">📦 מערכת ניהול הציוד</a>
+            <ul class="navbar-menu">
+                <li><a href="/" class="active">דשבורד</a></li>
+                <li><a href="#tasks">משימות</a></li>
+                <li><a href="#inventory">מלאי</a></li>
+            </ul>
+            <div class="navbar-user">
+                <span id="userName">משתמש</span>
+                <div class="user-avatar" id="userAvatar">U</div>
+                <button class="btn btn-outline" onclick="logout()">התנתקות</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div style="margin-top: 2rem;">
+            <!-- Welcome Section -->
+            <div class="card mb-4">
+                <h1>👋 ברוכים הבאים, <span id="userFullName">משתמש</span>!</h1>
+                <p>זה הדשבורד שלך. כאן תוכל לנהל את הציוד שלך ולעדכן מידע חשוב.</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-3 mb-4">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <p style="color: var(--text-light); margin: 0;">ציוד בשימוש</p>
+                            <h2 style="margin: 0; color: var(--primary-color);">5</h2>
+                        </div>
+                        <span style="font-size: 2.5rem;">📤</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <p style="color: var(--text-light); margin: 0;">משימות פתוחות</p>
+                            <h2 style="margin: 0; color: var(--warning-color);">3</h2>
+                        </div>
+                        <span style="font-size: 2.5rem;">📋</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: start;">
+                        <div>
+                            <p style="color: var(--text-light); margin: 0;">דוחות נזקים</p>
+                            <h2 style="margin: 0; color: var(--danger-color);">1</h2>
+                        </div>
+                        <span style="font-size: 2.5rem;">⚠️</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <h3>🚀 פעולות מהירות</h3>
+                <div class="grid grid-2" style="margin-top: 1.5rem;">
+                    <button class="btn btn-primary" onclick="showModal('checkoutModal')">
+                        📤 שליחת ציוד
+                    </button>
+                    <button class="btn btn-success" onclick="showModal('checkinModal')">
+                        📥 קבלת ציוד חזרה
+                    </button>
+                    <button class="btn btn-warning" onclick="showModal('damageModal')">
+                        ⚠️ דיווח נזק
+                    </button>
+                    <button class="btn btn-secondary" onclick="showModal('taskModal')">
+                        ➕ יצירת משימה
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="card">
+                <h3>📊 פעילות אחרונה</h3>
+                <table class="table" style="margin-top: 1rem;">
+                    <thead>
+                        <tr>
+                            <th>פעילות</th>
+                            <th>ציוד</th>
+                            <th>תאריך</th>
+                            <th>סטטוס</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>שליחה</td>
+                            <td>מיקרופון 1</td>
+                            <td>18/03/2026</td>
+                            <td><span class="badge badge-success">בשימוש</span></td>
+                        </tr>
+                        <tr>
+                            <td>קבלה</td>
+                            <td>מעמד סטנד</td>
+                            <td>17/03/2026</td>
+                            <td><span class="badge badge-success">זמין</span></td>
+                        </tr>
+                        <tr>
+                            <td>דיווח נזק</td>
+                            <td>כבל USB</td>
+                            <td>16/03/2026</td>
+                            <td><span class="badge badge-danger">ניזוק</span></td>
+                        </tr>
+                        <tr>
+                            <td>שליחה</td>
+                            <td>רמקול נייד</td>
+                            <td>15/03/2026</td>
+                            <td><span class="badge badge-success">בשימוש</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('checkoutModal')"></div>
+        <div class="modal-content">
+            <h3>📤 שליחת ציוד</h3>
+            <form>
+                <div class="form-group">
+                    <label>בחר ציוד</label>
+                    <select required>
+                        <option value="">-- בחר ציוד --</option>
+                        <option value="1">מיקרופון 1</option>
+                        <option value="2">מעמד סטנד</option>
+                        <option value="3">כבל USB</option>
+                        <option value="4">רמקול נייד</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>תאריך החזרה צפוי</label>
+                    <input type="date" required>
+                </div>
+                <div class="form-group">
+                    <label>הערות</label>
+                    <textarea placeholder="הוסף הערות אופציונליות..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('checkoutModal')">ביטול</button>
+                    <button type="submit" class="btn btn-primary">שלח ציוד</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Checkin Modal -->
+    <div id="checkinModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('checkinModal')"></div>
+        <div class="modal-content">
+            <h3>📥 קבלת ציוד חזרה</h3>
+            <form>
+                <div class="form-group">
+                    <label>בחר ציוד</label>
+                    <select required>
+                        <option value="">-- בחר ציוד --</option>
+                        <option value="1">מיקרופון 1</option>
+                        <option value="4">רמקול נייד</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>מצב הציוד</label>
+                    <select required>
+                        <option value="">-- בחר מצב --</option>
+                        <option value="good">טוב</option>
+                        <option value="fair">סביר</option>
+                        <option value="damaged">ניזוק</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>הערות</label>
+                    <textarea placeholder="תאר את מצב הציוד..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('checkinModal')">ביטול</button>
+                    <button type="submit" class="btn btn-success">קבל ציוד</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Damage Report Modal -->
+    <div id="damageModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('damageModal')"></div>
+        <div class="modal-content">
+            <h3>⚠️ דיווח נזק</h3>
+            <form>
+                <div class="form-group">
+                    <label>בחר ציוד</label>
+                    <select required>
+                        <option value="">-- בחר ציוד --</option>
+                        <option value="1">מיקרופון 1</option>
+                        <option value="2">מעמד סטנד</option>
+                        <option value="3">כבל USB</option>
+                        <option value="4">רמקול נייד</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>תיאור הנזק</label>
+                    <textarea placeholder="תאר את הנזק בפירוט..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>חומרת הנזק</label>
+                    <select required>
+                        <option value="">-- בחר חומרה --</option>
+                        <option value="minor">קל</option>
+                        <option value="moderate">בינוני</option>
+                        <option value="severe">חמור</option>
+                    </select>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('damageModal')">ביטול</button>
+                    <button type="submit" class="btn btn-danger">דווח על נזק</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="taskModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('taskModal')"></div>
+        <div class="modal-content">
+            <h3>➕ יצירת משימה חדשה</h3>
+            <form>
+                <div class="form-group">
+                    <label>כותרת המשימה</label>
+                    <input type="text" placeholder="תן שם למשימה..." required>
+                </div>
+                <div class="form-group">
+                    <label>תיאור</label>
+                    <textarea placeholder="תאר את המשימה..." required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>תאריך קביעה</label>
+                    <input type="date" required>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('taskModal')">ביטול</button>
+                    <button type="submit" class="btn btn-primary">צור משימה</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Styles -->
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <script>
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (!token || !user) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+            document.getElementById('userName').textContent = userData.username;
+            document.getElementById('userFullName').textContent = userData.full_name || userData.username;
+            document.getElementById('userAvatar').textContent = userData.username[0].toUpperCase();
+
+            // If admin, redirect to admin panel
+            if (userData.is_admin) {
+                // Show message that they should go to admin panel
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-info';
+                alert.innerHTML = 'ברוכים הבאים מנהל! <a href="/admin" style="color: var(--primary-color); font-weight: bold;">לחץ כאן כדי להיכנס לפאנל הניהול</a>';
+                document.querySelector('main').insertBefore(alert, document.querySelector('main').firstChild);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>

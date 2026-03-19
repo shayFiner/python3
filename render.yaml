@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: equipment-management
+    env: python
+    buildCommand: pip install -r requirements.txt && python init_demo_users.py
+    startCommand: python run.py
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: equipment-db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"
+
+databases:
+  - name: equipment-db
+    databaseName: equipment
+    user: equipment_user

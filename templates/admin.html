@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>פאנל ניהול - מערכת ניהול הציוד</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .admin-sidebar {
+            background-color: white;
+            border-left: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            min-width: 250px;
+        }
+
+        .admin-layout {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .admin-content {
+            flex: 1;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: var(--light-bg);
+            color: var(--primary-color);
+        }
+
+        .sidebar-menu a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .admin-warning {
+            background-color: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .admin-layout {
+                flex-direction: column;
+            }
+
+            .admin-sidebar {
+                position: static;
+                height: auto;
+                border-left: none;
+                border-bottom: 1px solid var(--border-color);
+                margin-bottom: 1rem;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                gap: 0.5rem;
+                overflow-x: auto;
+            }
+
+            .sidebar-menu li {
+                margin-bottom: 0;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="/" class="navbar-brand">👨‍💼 פאנל ניהול</a>
+            <ul class="navbar-menu">
+                <li><a href="/">חזור לדשבורד</a></li>
+            </ul>
+            <div class="navbar-user">
+                <span id="userName">מנהל</span>
+                <div class="user-avatar" id="userAvatar">A</div>
+                <button class="btn btn-outline" onclick="logout()">התנתקות</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="admin-layout">
+            <!-- Sidebar -->
+            <aside class="admin-sidebar">
+                <h3 style="margin-bottom: 1rem;">תפריט</h3>
+                <ul class="sidebar-menu">
+                    <li><a class="menu-item active" onclick="switchTab('dashboard')">📊 דשבורד</a></li>
+                    <li><a class="menu-item" onclick="switchTab('equipment')">📦 ניהול ציוד</a></li>
+                    <li><a class="menu-item" onclick="switchTab('users')">👥 ניהול משתמשים</a></li>
+                    <li><a class="menu-item" onclick="switchTab('damage')">⚠️ דוחות נזקים</a></li>
+                    <li><a class="menu-item" onclick="switchTab('inventory')">📊 ניהול מלאי</a></li>
+                    <li><a class="menu-item" onclick="switchTab('reports')">📈 דוחות</a></li>
+                </ul>
+            </aside>
+
+            <!-- Content -->
+            <div class="admin-content">
+
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <h2>📊 דשבורד מנהל</h2>
+                    <p>ברוכים הבאים לפאנל הניהול. כאן תוכל לנהל את כל היבטי המערכת.</p>
+
+                    <div class="stat-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">סה"כ ציוד</div>
+                            <div class="stat-value">45</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: var(--success-color);">
+                            <div class="stat-label">ציוד זמין</div>
+                            <div class="stat-value" style="color: var(--success-color);">32</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: var(--warning-color);">
+                            <div class="stat-label">בשימוש</div>
+                            <div class="stat-value" style="color: var(--warning-color);">10</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: var(--danger-color);">
+                            <div class="stat-label">ניזוק</div>
+                            <div class="stat-value" style="color: var(--danger-color);">3</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">סה"כ משתמשים</div>
+                            <div class="stat-value">12</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">משתמשים פעילים</div>
+                            <div class="stat-value">10</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3>📋 פעילויות אחרונות בעיקר</h3>
+                        <table class="table" style="margin-top: 1rem;">
+                            <thead>
+                                <tr>
+                                    <th>משתמש</th>
+                                    <th>פעילות</th>
+                                    <th>פרטים</th>
+                                    <th>זמן</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>שי בר</td>
+                                    <td>שליחה</td>
+                                    <td>מיקרופון 1</td>
+                                    <td>18/03/2026 14:30</td>
+                                </tr>
+                                <tr>
+                                    <td>דויד כהן</td>
+                                    <td>קבלה</td>
+                                    <td>מעמד סטנד</td>
+                                    <td>18/03/2026 12:15</td>
+                                </tr>
+                                <tr>
+                                    <td>שי בר</td>
+                                    <td>דיווח נזק</td>
+                                    <td>כבל USB</td>
+                                    <td>17/03/2026 16:45</td>
+                                </tr>
+                                <tr>
+                                    <td>שרה דוד</td>
+                                    <td>יצירה</td>
+                                    <td>רמקול חדש</td>
+                                    <td>17/03/2026 10:20</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Equipment Management Tab -->
+                <div id="equipment" class="tab-content">
+                    <h2>📦 ניהול ציוד</h2>
+
+                    <div class="admin-warning">
+                        ⚠️ <strong>זה שטח מנהל בלבד!</strong> רק מנהלים יכולים להוסיף, לערוך ולמחוק ציוד.
+                    </div>
+
+                    <button class="btn btn-primary mb-4" onclick="showModal('addEquipmentModal')">
+                        ➕ הוסף ציוד חדש
+                    </button>
+
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>שם הציוד</th>
+                                    <th>קטגוריה</th>
+                                    <th>סטטוס</th>
+                                    <th>S/N</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>מיקרופון 1</td>
+                                    <td>אודיו</td>
+                                    <td><span class="badge badge-warning">בשימוש</span></td>
+                                    <td>MIC-001</td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">עריכה</button>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">מחיקה</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>מעמד סטנד</td>
+                                    <td>תמיכה</td>
+                                    <td><span class="badge badge-success">זמין</span></td>
+                                    <td>STAND-001</td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">עריכה</button>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">מחיקה</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>כבל USB</td>
+                                    <td>כבלים</td>
+                                    <td><span class="badge badge-danger">ניזוק</span></td>
+                                    <td>CABLE-001</td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">עריכה</button>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">מחיקה</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- User Management Tab -->
+                <div id="users" class="tab-content">
+                    <h2>👥 ניהול משתמשים</h2>
+
+                    <div class="admin-warning">
+                        ⚠️ <strong>זה שטח מנהל בלבד!</strong> רק מנהלים יכולים ליצור, לערוך ולהסיר משתמשים.
+                    </div>
+
+                    <button class="btn btn-primary mb-4" onclick="showModal('addUserModal')">
+                        ➕ הוסף משתמש חדש
+                    </button>
+
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>שם משתמש</th>
+                                    <th>שם מלא</th>
+                                    <th>דוא"ל</th>
+                                    <th>תפקיד</th>
+                                    <th>סטטוס</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>admin</td>
+                                    <td>מנהל המערכת</td>
+                                    <td>admin@system.com</td>
+                                    <td><span class="badge badge-info">מנהל</span></td>
+                                    <td><span class="badge badge-success">פעיל</span></td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">עריכה</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>user</td>
+                                    <td>שי בר</td>
+                                    <td>user@system.com</td>
+                                    <td>משתמש</td>
+                                    <td><span class="badge badge-success">פעיל</span></td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">עריכה</button>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">מחיקה</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>david</td>
+                                    <td>דויד כהן</td>
+                                    <td>david@system.com</td>
+                                    <td>משתמש</td>
+                                    <td><span class="badge badge-success">פעיל</span></td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">עריכה</button>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">מחיקה</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Damage Reports Tab -->
+                <div id="damage" class="tab-content">
+                    <h2>⚠️ דוחות נזקים</h2>
+
+                    <div class="admin-warning">
+                        ⚠️ <strong>זה שטח מנהל בלבד!</strong> כאן תוכל לנהל דוחות נזק ולעדכן סטטוס תיקון.
+                    </div>
+
+                    <div class="card">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ציוד</th>
+                                    <th>תיאור הנזק</th>
+                                    <th>חומרה</th>
+                                    <th>סטטוס</th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>כבל USB</td>
+                                    <td>שבור קצה USB</td>
+                                    <td><span class="badge badge-danger">חמור</span></td>
+                                    <td><span class="badge badge-warning">בתיקון</span></td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">עדכן סטטוס</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>מעמד סטנד</td>
+                                    <td>שריטה בחלק העליון</td>
+                                    <td><span class="badge badge-info">קל</span></td>
+                                    <td><span class="badge badge-success">תוקן</span></td>
+                                    <td>
+                                        <button class="btn" style="padding: 0.5rem 0.75rem; font-size: 0.875rem;">צפה בפרטים</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Inventory Management Tab -->
+                <div id="inventory" class="tab-content">
+                    <h2>📊 ניהול מלאי</h2>
+
+                    <div class="admin-warning">
+                        ⚠️ <strong>זה שטח מנהל בלבד!</strong> כאן תוכל לראות דוח מלא על המלאי.
+                    </div>
+
+                    <div class="card">
+                        <h3>סיכום מלאי</h3>
+                        <table class="table" style="margin-top: 1rem;">
+                            <thead>
+                                <tr>
+                                    <th>ציוד</th>
+                                    <th>סה"כ</th>
+                                    <th>זמין</th>
+                                    <th>בשימוש</th>
+                                    <th>ניזוק</th>
+                                    <th>בתיקון</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>מיקרופון</td>
+                                    <td>5</td>
+                                    <td>3</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>מעמד סטנד</td>
+                                    <td>8</td>
+                                    <td>7</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>כבל USB</td>
+                                    <td>10</td>
+                                    <td>8</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr>
+                                    <td>רמקול</td>
+                                    <td>6</td>
+                                    <td>4</td>
+                                    <td>2</td>
+                                    <td>0</td>
+                                    <td>0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reports Tab -->
+                <div id="reports" class="tab-content">
+                    <h2>📈 דוחות</h2>
+
+                    <div class="admin-warning">
+                        ⚠️ <strong>זה שטח מנהל בלבד!</strong> צפה בדוחות מעמיקים של המערכת.
+                    </div>
+
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <h3>📅 דוח פעילויות חודשי</h3>
+                            <p style="color: var(--text-light); margin-bottom: 1rem;">סכום של כל הפעילויות בחודש זה</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <p style="color: var(--text-light); margin: 0.5rem 0;">שליחות: 45</p>
+                                    <p style="color: var(--text-light); margin: 0.5rem 0;">קבלות: 40</p>
+                                    <p style="color: var(--text-light); margin: 0.5rem 0;">דוחות נזק: 5</p>
+                                </div>
+                                <span style="font-size: 2rem;">📊</span>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h3>👥 דוח משתמשים</h3>
+                            <p style="color: var(--text-light); margin-bottom: 1rem;">סטטיסטיקה על פעילות המשתמשים</p>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <p style="color: var(--text-light); margin: 0.5rem 0;">משתמשים פעילים: 10</p>
+                                    <p style="color: var(--text-light); margin: 0.5rem 0;">משתמשים לא פעילים: 2</p>
+                                    <p style="color: var(--text-light); margin: 0.5rem 0;">חדשים בחודש: 1</p>
+                                </div>
+                                <span style="font-size: 2rem;">👥</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Equipment Modal -->
+    <div id="addEquipmentModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('addEquipmentModal')"></div>
+        <div class="modal-content">
+            <h3>➕ הוסף ציוד חדש</h3>
+            <form>
+                <div class="form-group">
+                    <label>שם הציוד</label>
+                    <input type="text" placeholder="למ' מיקרופון 1" required>
+                </div>
+                <div class="form-group">
+                    <label>קטגוריה</label>
+                    <select required>
+                        <option value="">-- בחר קטגוריה --</option>
+                        <option value="audio">אודיו</option>
+                        <option value="support">תמיכה</option>
+                        <option value="cables">כבלים</option>
+                        <option value="other">אחר</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Serial Number (S/N)</label>
+                    <input type="text" required>
+                </div>
+                <div class="form-group">
+                    <label>תיאור</label>
+                    <textarea placeholder="תאר את הציוד..."></textarea>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addEquipmentModal')">ביטול</button>
+                    <button type="submit" class="btn btn-primary">הוסף ציוד</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal hidden">
+        <div class="modal-overlay" onclick="closeModal('addUserModal')"></div>
+        <div class="modal-content">
+            <h3>➕ הוסף משתמש חדש</h3>
+            <form>
+                <div class="form-group">
+                    <label>שם משתמש</label>
+                    <input type="text" required>
+                </div>
+                <div class="form-group">
+                    <label>שם מלא</label>
+                    <input type="text" required>
+                </div>
+                <div class="form-group">
+                    <label>דוא"ל</label>
+                    <input type="email" required>
+                </div>
+                <div class="form-group">
+                    <label>סיסמה</label>
+                    <input type="password" required>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="isAdmin">
+                        הנפק כמנהל
+                    </label>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addUserModal')">ביטול</button>
+                    <button type="submit" class="btn btn-primary">הוסף משתמש</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Styles -->
+    <style>
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: flex-end;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <script>
+        // Check if user is admin
+        function checkAuth() {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+
+            if (!token || !user) {
+                window.location.href = '/login';
+                return;
+            }
+
+            const userData = JSON.parse(user);
+
+            if (!userData.is_admin) {
+                // Redirect non-admins to dashboard
+                window.location.href = '/';
+                return;
+            }
+
+            document.getElementById('userName').textContent = userData.username;
+            document.getElementById('userAvatar').textContent = userData.username[0].toUpperCase();
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            // Remove active class from menu items
+            const menuItems = document.querySelectorAll('.menu-item');
+            menuItems.forEach(item => item.classList.remove('active'));
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to menu item
+            event.target.classList.add('active');
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', checkAuth);
+    </script>
+</body>
+</html>
