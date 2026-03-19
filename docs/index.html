@@ -138,6 +138,7 @@ tbody tr:hover{background:#f8fafc}
 @media(max-width:768px){
   .mobile-bottom-nav{display:block}
   #user-screen .main-content{padding-bottom:4.5rem}
+  #toast{bottom:4.5rem}
 }
 /* CHAT */
 .chat-layout{display:flex;gap:1rem;height:500px}
@@ -166,6 +167,23 @@ tbody tr:hover{background:#f8fafc}
 .emp-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.9rem}
 .emp-mini-card{background:var(--bg);border-radius:var(--radius);padding:1rem;text-align:center;border:1.5px solid var(--border)}
 .emp-mini-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--purple));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;margin:0 auto .5rem;font-size:1rem}
+/* NOTIFICATION BADGE */
+.notif-badge{background:var(--danger);color:#fff;border-radius:50%;width:18px;height:18px;font-size:.68rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;position:absolute;top:-4px;right:-4px}
+.notif-wrap{position:relative;display:inline-block}
+/* TASK DETAIL */
+.task-detail-block{background:var(--bg);border-radius:.5rem;padding:.75rem;margin-bottom:.65rem;border-right:3px solid var(--primary)}
+.task-detail-label{font-size:.75rem;color:var(--text-light);font-weight:600;margin-bottom:.2rem;text-transform:uppercase}
+.task-detail-value{font-size:.9rem;font-weight:500}
+/* EQ CHECKLIST */
+.eq-check-list{max-height:160px;overflow-y:auto;border:1.5px solid var(--border);border-radius:.5rem;padding:.5rem}
+.eq-check-item{display:flex;align-items:center;gap:.5rem;padding:.3rem .4rem;border-radius:.3rem;cursor:pointer;font-size:.85rem}
+.eq-check-item:hover{background:#eff6ff}
+.eq-check-item input[type=checkbox]{accent-color:var(--primary)}
+/* USER TASK CARD */
+.user-task-card{background:#fff;border-radius:.75rem;padding:1rem;margin-bottom:.75rem;box-shadow:0 1px 4px rgba(0,0,0,.08);border-right:4px solid var(--primary);cursor:pointer;transition:box-shadow .15s}
+.user-task-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.user-task-card.done{border-right-color:var(--success);opacity:.7}
+.user-task-card.urgent{border-right-color:var(--danger)}
 /* RESPONSIVE */
 @media(max-width:768px){
   .grid-2{grid-template-columns:1fr}
@@ -295,8 +313,8 @@ tbody tr:hover{background:#f8fafc}
     <div class="card"><div class="table-wrap"><table><thead><tr><th>ציוד</th><th>קטגוריה</th><th>מצב</th><th>פעולות</th></tr></thead><tbody id="u-eq-table"></tbody></table></div></div>
   </div>
   <div id="user-tasks" class="tab-content">
-    <div class="page-title"><h2>📋 המשימות שלי</h2><p>משימות שהוקצו לך על ידי המנהל</p></div>
-    <div class="card"><div class="table-wrap"><table><thead><tr><th>משימה</th><th>תיאור</th><th>תאריך</th><th>עדיפות</th><th>סטטוס</th><th>פעולות</th></tr></thead><tbody id="u-tasks-table"></tbody></table></div></div>
+    <div class="page-title"><h2>📋 המשימות שלי</h2><p>לחץ על משימה לפרטים ועדכון סטטוס</p></div>
+    <div id="u-tasks-cards"></div>
   </div>
   <div id="user-history" class="tab-content">
     <div class="page-title"><h2>📈 היסטוריה</h2></div>
@@ -337,7 +355,10 @@ tbody tr:hover{background:#f8fafc}
   <div class="navbar-brand">👨‍💼 <span id="sys-name-admin">מערכת ניהול ציוד</span></div>
   <div class="navbar-user">
     <span class="admin-badge">מנהל</span>
-    <div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#be185d)">A</div>
+    <div class="notif-wrap" style="cursor:pointer" onclick="showAdminTab('a-overview',document.querySelector(\'.sidebar-menu a\'))">
+      <div class="avatar" style="background:linear-gradient(135deg,#7c3aed,#be185d)" id="admin-avatar-letter">A</div>
+      <span class="notif-badge" id="notif-badge" style="display:none">0</span>
+    </div>
     <button class="btn btn-ghost btn-sm" onclick="doLogout()">יציאה</button>
   </div>
 </nav>
@@ -531,17 +552,33 @@ tbody tr:hover{background:#f8fafc}
   <h3>📋 משימה חדשה</h3>
   <div class="form-group"><label>כותרת</label><input type="text" id="nt-title" style="width:100%" placeholder="כותרת המשימה"></div>
   <div class="form-group"><label>תיאור</label><textarea id="nt-desc" style="width:100%" placeholder="תיאור המשימה..."></textarea></div>
+  <div class="form-group"><label>📍 מיקום האירוע</label><input type="text" id="nt-location" style="width:100%" placeholder="לדוג׳ אולם ב׳, כתובת האירוע..."></div>
   <div class="form-group"><label>הקצה לעובד</label><select id="nt-assignee" style="width:100%"></select></div>
   <div class="form-group"><label>עדיפות</label><select id="nt-priority" style="width:100%"><option>גבוה</option><option>בינוני</option><option>נמוך</option></select></div>
   <div class="form-group"><label>תאריך יעד</label><input type="date" id="nt-date" style="width:100%"></div>
+  <div class="form-group"><label>🎒 ציוד שצריך לקחת</label><div class="eq-check-list" id="nt-eq-list"><div style="color:var(--text-light);font-size:.82rem">אין ציוד במערכת</div></div></div>
   <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('add-task-modal')">ביטול</button><button class="btn btn-primary btn-inline" onclick="addTask()">✅ צור משימה</button></div>
 </div></div>
 
 <div id="edit-task-modal" class="modal-overlay"><div class="modal">
-  <h3>✏️ עריכת משימה</h3><input type="hidden" id="et-id">
+  <h3>✏️ עריכת משימה (מנהל)</h3><input type="hidden" id="et-id">
+  <div class="form-group"><label>כותרת</label><input type="text" id="et-title" style="width:100%"></div>
+  <div class="form-group"><label>מיקום האירוע</label><input type="text" id="et-location" style="width:100%"></div>
   <div class="form-group"><label>סטטוס</label><select id="et-status" style="width:100%"><option>פתוח</option><option>בביצוע</option><option>הושלם</option></select></div>
   <div class="form-group"><label>הערות</label><textarea id="et-notes" style="width:100%" placeholder="הוסף הערות..."></textarea></div>
   <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('edit-task-modal')">ביטול</button><button class="btn btn-primary btn-inline" onclick="saveEditTask()">💾 שמור</button></div>
+</div></div>
+
+<!-- USER TASK DETAIL MODAL -->
+<div id="user-task-modal" class="modal-overlay"><div class="modal">
+  <h3>📋 פרטי משימה</h3><input type="hidden" id="ut-id">
+  <div id="ut-details"></div>
+  <div class="form-group" style="margin-top:.9rem"><label>עדכון סטטוס</label><select id="ut-status" style="width:100%"><option>פתוח</option><option>בביצוע</option><option>הושלם</option></select></div>
+  <div class="form-group"><label>הערות / עדכון לדשבורד המנהל</label><textarea id="ut-notes" style="width:100%" placeholder="הוסף הערה שתישלח למנהל..."></textarea></div>
+  <div class="modal-actions">
+    <button class="btn btn-ghost" onclick="closeModal('user-task-modal')">סגור</button>
+    <button class="btn btn-primary btn-inline" onclick="saveUserTaskUpdate()">💾 שמור ועדכן מנהל</button>
+  </div>
 </div></div>
 
 <div id="checkout-modal" class="modal-overlay"><div class="modal">
@@ -584,7 +621,7 @@ const STORAGE_KEY = 'indorski_data';
 
 function saveData(){
   try{
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({USERS,equipment,categories,damageReports,tasks,history,chatMessages,systemSettings,permissions,nid}));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({USERS,equipment,categories,damageReports,tasks,history,chatMessages,systemSettings,permissions,nid,notifications}));
   }catch(e){}
 }
 function loadData(){
@@ -602,6 +639,7 @@ function loadData(){
     if(d.systemSettings)systemSettings=d.systemSettings;
     if(d.permissions)permissions=d.permissions;
     if(d.nid)nid=d.nid;
+    if(d.notifications)notifications=d.notifications;
   }catch(e){seedInitialData();}
 }
 function seedInitialData(){
@@ -624,9 +662,9 @@ function seedInitialData(){
     {id:2,equipmentName:'מעמד מיקרופון',reportedBy:'דויד כהן',desc:'שריטה בחלק העליון',severity:'קל',status:'תוקן',date:'10/03/2026'},
   ];
   tasks=[
-    {id:1,title:'החזרת ציוד לאולם',desc:'להחזיר את כל הציוד לאולם ב׳',assignedTo:2,date:'20/03/2026',priority:'גבוה',status:'פתוח',notes:''},
-    {id:2,title:'בדיקת רמקולים',desc:'לבדוק שכל הרמקולים עובדים',assignedTo:3,date:'22/03/2026',priority:'בינוני',status:'פתוח',notes:''},
-    {id:3,title:'הזמנת כבלים',desc:'הזמין 5 כבלי XLR חדשים',assignedTo:2,date:'15/03/2026',priority:'נמוך',status:'הושלם',notes:''},
+    {id:1,title:'החזרת ציוד לאולם',desc:'להחזיר את כל הציוד לאולם ב׳ אחרי האירוע',assignedTo:2,date:'20/03/2026',priority:'גבוה',status:'פתוח',notes:'',location:'אולם ב׳, מרכז כנסים תל אביב',equipmentIds:[1,4,5]},
+    {id:2,title:'בדיקת רמקולים',desc:'לבדוק שכל הרמקולים עובדים לפני האירוע',assignedTo:3,date:'22/03/2026',priority:'בינוני',status:'פתוח',notes:'',location:'אולם ראשי',equipmentIds:[4,6]},
+    {id:3,title:'הזמנת כבלים',desc:'הזמין 5 כבלי XLR חדשים למחסן',assignedTo:2,date:'15/03/2026',priority:'נמוך',status:'הושלם',notes:'בוצע!',location:'',equipmentIds:[]},
   ];
   history=[
     {type:'שליחה',equipment:'מיקרופון Shure SM58',by:'שי בר',date:'18/03/2026 09:30',detail:'—'},
@@ -650,6 +688,7 @@ let chatMessages = [];
 let systemSettings = {name:'מערכת ניהול ציוד',company:'אינדורסקי הפקות'};
 let permissions = {canReportDamage:true,canCheckout:true,canCheckin:true,historyVisible:true};
 let nid = {eq:1,task:1,dmg:1,chat:1,user:2};
+let notifications = []; // {id,msg,from,taskId,time,read}
 let currentUser = null;
 let chatTarget = null;
 
@@ -667,9 +706,13 @@ function doLogin(){
 }
 function loginAs(user){
   currentUser=user;
-  if(user.isAdmin){showScreen('admin-screen');renderAdmin();}
-  else{
+  if(user.isAdmin){
+    const al=document.getElementById('admin-avatar-letter');
+    if(al)al.textContent=user.fullName[0];
+    showScreen('admin-screen');renderAdmin();
+  } else{
     document.getElementById('user-name-display').textContent=user.fullName;
+    document.getElementById('user-name-display').style.display='';
     document.getElementById('user-avatar').textContent=user.fullName[0];
     document.getElementById('user-greeting').textContent=user.fullName.split(' ')[0]+'!';
     showScreen('user-screen');renderUser();
@@ -703,7 +746,7 @@ function pinPress(v){
   else if(v==='ok'){
     const user=USERS.find(x=>x.pin===pinCode&&!x.isAdmin&&x.active);
     if(!user){err.classList.add('show');pinCode='';updatePinDisplay();return;}
-    currentUser=user;renderEmployeeCard(user);showScreen('employee-card-screen');
+    loginAs(user);
   }
   else if(pinCode.length<4){pinCode+=v;}
   updatePinDisplay();
@@ -809,6 +852,9 @@ function userName(id){const u=USERS.find(x=>x.id===id);return u?u.fullName:'—'
 function renderUser(){
   document.getElementById('sys-name-user').textContent=systemSettings.name;
   renderUserStats();renderUserActivity();renderMyEquipment();renderUserTasks();renderUserHistory();
+  showUserTab('dashboard',null);
+  document.querySelectorAll('#user-screen .navbar-links a').forEach((a,i)=>{if(i===0)a.classList.add('active');else a.classList.remove('active');});
+  document.querySelectorAll('.mobile-bottom-nav a').forEach((a,i)=>{if(i===0)a.classList.add('active');else a.classList.remove('active');});
 }
 function renderUserStats(){
   const u=currentUser;
@@ -828,9 +874,24 @@ function renderMyEquipment(){
   tb.innerHTML=mine.length?mine.map(e=>`<tr><td><strong>${e.name}</strong></td><td>${e.category}</td><td>${sBadge(e.status)}</td><td><button class="btn btn-success btn-sm" onclick="openCheckinFor(${e.id})">📥 החזר</button></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--text-light)">אין ציוד אצלך</td></tr>';
 }
 function renderUserTasks(){
-  const tb=document.getElementById('u-tasks-table');
+  const container=document.getElementById('u-tasks-cards');if(!container)return;
   const mine=tasks.filter(t=>t.assignedTo===currentUser.id);
-  tb.innerHTML=mine.length?mine.map(t=>`<tr><td><strong>${t.title}</strong></td><td>${t.desc}</td><td>${t.date}</td><td>${pBadge(t.priority)}</td><td>${tsBadge(t.status)}</td><td><button class="btn btn-ghost btn-sm" onclick="openEditTask(${t.id})">✏️ ערוך</button></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין משימות מוקצות אליך</td></tr>';
+  if(!mine.length){container.innerHTML='<div class="card" style="text-align:center;color:var(--text-light);padding:2rem">אין משימות מוקצות אליך כרגע</div>';return;}
+  container.innerHTML=mine.map(t=>{
+    const eqNames=(t.equipmentIds||[]).map(id=>{const e=equipment.find(x=>x.id===id);return e?e.name:'';}).filter(Boolean);
+    const isDone=t.status==='הושלם';
+    const isUrgent=t.priority==='גבוה'&&!isDone;
+    return `<div class="user-task-card ${isDone?'done':''} ${isUrgent?'urgent':''}" onclick="openUserTask(${t.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.4rem">
+        <strong style="font-size:.95rem">${t.title}</strong>
+        <div style="display:flex;gap:.3rem">${pBadge(t.priority)} ${tsBadge(t.status)}</div>
+      </div>
+      <div style="font-size:.82rem;color:var(--text-light);margin-bottom:.35rem">${t.desc}</div>
+      ${t.location?`<div style="font-size:.8rem;color:var(--primary);margin-bottom:.3rem">📍 ${t.location}</div>`:''}
+      ${eqNames.length?`<div style="font-size:.8rem;color:#7c3aed">🎒 ${eqNames.join(' | ')}</div>`:''}
+      <div style="font-size:.75rem;color:var(--text-light);margin-top:.4rem">📅 ${t.date} · לחץ לפרטים ועדכון</div>
+    </div>`;
+  }).join('');
 }
 function renderUserHistory(){
   const tb=document.getElementById('u-history-table');
@@ -842,6 +903,17 @@ function renderUserHistory(){
 function renderAdmin(){
   document.getElementById('sys-name-admin').textContent=systemSettings.name;
   renderAdminOverview();renderAdminEq();renderAdminUsers();renderAdminTasks();renderAdminDamage();renderAdminInventory();renderAdminReports();
+  renderNotifBadge();
+}
+function renderNotifBadge(){
+  const badge=document.getElementById('notif-badge');if(!badge)return;
+  const unread=notifications.filter(n=>!n.read).length;
+  badge.textContent=unread;
+  badge.style.display=unread>0?'inline-flex':'none';
+}
+function addNotification(msg,from,taskId){
+  notifications.unshift({id:Date.now(),msg,from,taskId,time:nowStr(),read:false});
+  saveData();renderNotifBadge();
 }
 function renderAdminOverview(){
   document.getElementById('ov-total').textContent=equipment.length;
@@ -851,7 +923,23 @@ function renderAdminOverview(){
   document.getElementById('ov-users').textContent=USERS.filter(u=>!u.isAdmin&&u.active).length;
   document.getElementById('ov-tasks').textContent=tasks.filter(t=>t.status!=='הושלם').length;
   const tb=document.getElementById('a-activity');
+  const unreadNotifs=notifications.filter(n=>!n.read);
+  let notifHtml='';
+  if(unreadNotifs.length){
+    notifHtml=`<div style="margin-bottom:.9rem;background:#fef9c3;border:1px solid #fde047;border-radius:.5rem;padding:.75rem">
+      <div style="font-weight:700;font-size:.88rem;margin-bottom:.5rem">🔔 עדכונים מהעובדים (${unreadNotifs.length})</div>
+      ${unreadNotifs.map(n=>`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.4rem;font-size:.83rem"><span>👤 <strong>${n.from}</strong>: ${n.msg}</span><span style="color:var(--text-light);font-size:.75rem;margin-right:.5rem">${n.time}</span></div>`).join('')}
+      <button class="btn btn-ghost btn-sm" style="margin-top:.3rem" onclick="markNotifsRead()">✓ סמן כנקרא</button>
+    </div>`;
+  }
+  const overviewEl=document.getElementById('a-overview');
+  const existingNotif=overviewEl.querySelector('.notif-panel');
+  if(existingNotif)existingNotif.remove();
+  if(notifHtml){const d=document.createElement('div');d.className='notif-panel';d.innerHTML=notifHtml;const statsGrid=overviewEl.querySelector('.stats-grid');if(statsGrid)overviewEl.insertBefore(d,statsGrid);}
   tb.innerHTML=[...history].reverse().slice(0,5).map(r=>`<tr><td>${r.by||'—'}</td><td>${hBadge(r.type)}</td><td>${r.equipment}</td><td>${r.date}</td></tr>`).join('')||'<tr><td colspan="4" style="text-align:center;color:var(--text-light)">אין פעילות</td></tr>';
+}
+function markNotifsRead(){
+  notifications.forEach(n=>n.read=true);saveData();renderAdmin();
 }
 function renderAdminEq(){
   const tb=document.getElementById('a-eq-table');
@@ -868,7 +956,10 @@ function renderAdminUsers(){
 }
 function renderAdminTasks(){
   const tb=document.getElementById('a-tasks-table');
-  tb.innerHTML=tasks.length?tasks.map(t=>`<tr><td><strong>${t.title}</strong></td><td>${userName(t.assignedTo)}</td><td>${t.date}</td><td>${pBadge(t.priority)}</td><td>${tsBadge(t.status)}</td><td><button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">🗑️</button></td></tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין משימות עדיין</td></tr>';
+  tb.innerHTML=tasks.length?tasks.map(t=>{
+    const eqNames=(t.equipmentIds||[]).map(id=>{const e=equipment.find(x=>x.id===id);return e?e.name:'';}).filter(Boolean).join(', ');
+    return `<tr><td><strong>${t.title}</strong>${t.location?`<br><span style="font-size:.75rem;color:var(--text-light)">📍 ${t.location}</span>`:''}${eqNames?`<br><span style="font-size:.75rem;color:var(--primary)">🎒 ${eqNames}</span>`:''}</td><td>${userName(t.assignedTo)}</td><td>${t.date}</td><td>${pBadge(t.priority)}</td><td>${tsBadge(t.status)}</td><td><button class="btn btn-ghost btn-sm" onclick="openEditTask(${t.id})">✏️</button> <button class="btn btn-danger btn-sm" onclick="deleteTask(${t.id})">🗑️</button></td></tr>`;
+  }).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין משימות עדיין</td></tr>';
 }
 function renderAdminDamage(){
   const tb=document.getElementById('a-damage-table');
@@ -1101,14 +1192,22 @@ function populateTaskUsers(){
   const sel=document.getElementById('nt-assignee');
   const workers=USERS.filter(u=>!u.isAdmin&&u.active);
   sel.innerHTML=workers.length?workers.map(u=>`<option value="${u.id}">${u.fullName}</option>`).join(''):'<option disabled>אין עובדים פעילים</option>';
+  populateTaskEqList();
+}
+function populateTaskEqList(){
+  const el=document.getElementById('nt-eq-list');if(!el)return;
+  if(!equipment.length){el.innerHTML='<div style="color:var(--text-light);font-size:.82rem">אין ציוד במערכת</div>';return;}
+  el.innerHTML=equipment.map(e=>`<label class="eq-check-item"><input type="checkbox" id="eq-check-${e.id}" value="${e.id}"> ${e.name} <span style="color:var(--text-light);font-size:.75rem">(${e.category})</span></label>`).join('');
 }
 function addTask(){
   const title=document.getElementById('nt-title').value.trim();
   if(!title){alert('יש להזין כותרת');return;}
   const assignee=parseInt(document.getElementById('nt-assignee').value);
   const date=document.getElementById('nt-date').value;
-  tasks.push({id:nid.task++,title,desc:document.getElementById('nt-desc').value.trim(),assignedTo:assignee,date:date?date.split('-').reverse().join('/'):today(),priority:document.getElementById('nt-priority').value,status:'פתוח',notes:''});
-  ['nt-title','nt-desc','nt-date'].forEach(id=>document.getElementById(id).value='');
+  const location=document.getElementById('nt-location').value.trim();
+  const equipmentIds=[...document.querySelectorAll('#nt-eq-list input:checked')].map(cb=>parseInt(cb.value));
+  tasks.push({id:nid.task++,title,desc:document.getElementById('nt-desc').value.trim(),assignedTo:assignee,date:date?date.split('-').reverse().join('/'):today(),priority:document.getElementById('nt-priority').value,status:'פתוח',notes:'',location,equipmentIds});
+  ['nt-title','nt-desc','nt-date','nt-location'].forEach(id=>document.getElementById(id).value='');
   closeModal('add-task-modal');renderAdminTasks();renderAdminOverview();saveData();showToast('המשימה נוצרה ✅');checkTasksAutoExport();
 }
 function deleteTask(id){
@@ -1118,6 +1217,8 @@ function deleteTask(id){
 function openEditTask(id){
   const t=tasks.find(x=>x.id===id);if(!t)return;
   document.getElementById('et-id').value=t.id;
+  document.getElementById('et-title').value=t.title||'';
+  document.getElementById('et-location').value=t.location||'';
   document.getElementById('et-status').value=t.status;
   document.getElementById('et-notes').value=t.notes||'';
   openModal('edit-task-modal');
@@ -1125,9 +1226,45 @@ function openEditTask(id){
 function saveEditTask(){
   const id=parseInt(document.getElementById('et-id').value);
   const t=tasks.find(x=>x.id===id);if(!t)return;
+  t.title=document.getElementById('et-title').value.trim()||t.title;
+  t.location=document.getElementById('et-location').value.trim();
   t.status=document.getElementById('et-status').value;
   t.notes=document.getElementById('et-notes').value.trim();
-  closeModal('edit-task-modal');renderUserTasks();renderUserStats();saveData();showToast('המשימה עודכנה ✅');
+  closeModal('edit-task-modal');renderAdminTasks();renderAdminOverview();saveData();showToast('המשימה עודכנה ✅');
+}
+// ===== USER TASK DETAIL =====
+function openUserTask(id){
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  document.getElementById('ut-id').value=t.id;
+  document.getElementById('ut-status').value=t.status;
+  document.getElementById('ut-notes').value='';
+  const eqNames=(t.equipmentIds||[]).map(eid=>{const e=equipment.find(x=>x.id===eid);return e?`<div style="padding:.35rem .6rem;background:#eff6ff;border-radius:.4rem;font-size:.83rem;margin-bottom:.3rem">🎒 ${e.name} <span style="color:var(--text-light)">(${e.category})</span></div>`:''}).filter(Boolean).join('');
+  document.getElementById('ut-details').innerHTML=`
+    <div class="task-detail-block"><div class="task-detail-label">כותרת</div><div class="task-detail-value">${t.title}</div></div>
+    ${t.desc?`<div class="task-detail-block"><div class="task-detail-label">תיאור</div><div class="task-detail-value">${t.desc}</div></div>`:''}
+    ${t.location?`<div class="task-detail-block" style="border-right-color:var(--warning)"><div class="task-detail-label">📍 מיקום האירוע</div><div class="task-detail-value" style="font-weight:700">${t.location}</div></div>`:''}
+    ${eqNames?`<div class="task-detail-block" style="border-right-color:var(--purple)"><div class="task-detail-label">🎒 ציוד שצריך לקחת</div><div style="margin-top:.3rem">${eqNames}</div></div>`:''}
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem">
+      <span>${pBadge(t.priority)}</span><span>${tsBadge(t.status)}</span><span style="font-size:.8rem;color:var(--text-light)">📅 ${t.date}</span>
+    </div>
+    ${t.notes?`<div class="task-detail-block" style="border-right-color:var(--success)"><div class="task-detail-label">הערות אחרונות</div><div class="task-detail-value">${t.notes}</div></div>`:''}
+  `;
+  openModal('user-task-modal');
+}
+function saveUserTaskUpdate(){
+  const id=parseInt(document.getElementById('ut-id').value);
+  const t=tasks.find(x=>x.id===id);if(!t)return;
+  const newStatus=document.getElementById('ut-status').value;
+  const newNotes=document.getElementById('ut-notes').value.trim();
+  const statusChanged=t.status!==newStatus;
+  t.status=newStatus;
+  if(newNotes)t.notes=newNotes;
+  // notify admin
+  let notifMsg=`עדכון במשימה "${t.title}"`;
+  if(statusChanged)notifMsg+=` → סטטוס: ${newStatus}`;
+  if(newNotes)notifMsg+=` | הערה: "${newNotes}"`;
+  addNotification(notifMsg,currentUser.fullName,t.id);
+  closeModal('user-task-modal');renderUserTasks();renderUserStats();saveData();showToast('המשימה עודכנה ✅ המנהל קיבל הודעה');
 }
 
 // ===== DAMAGE =====
