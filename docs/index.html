@@ -557,6 +557,7 @@ tbody tr:hover{background:#f8fafc}
   <div class="form-group"><label>עדיפות</label><select id="nt-priority" style="width:100%"><option>גבוה</option><option>בינוני</option><option>נמוך</option></select></div>
   <div class="form-group"><label>תאריך יעד</label><input type="date" id="nt-date" style="width:100%"></div>
   <div class="form-group"><label>🎒 ציוד שצריך לקחת</label><div class="eq-check-list" id="nt-eq-list"><div style="color:var(--text-light);font-size:.82rem">אין ציוד במערכת</div></div></div>
+  <div class="form-group"><label>📝 הערות למשימה</label><textarea id="nt-notes-field" style="width:100%" placeholder="הוראות מיוחדות, הערות נוספות..."></textarea></div>
   <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal('add-task-modal')">ביטול</button><button class="btn btn-primary btn-inline" onclick="addTask()">✅ צור משימה</button></div>
 </div></div>
 
@@ -887,7 +888,10 @@ function renderUserTasks(){
         <div style="display:flex;gap:.3rem">${pBadge(t.priority)} ${tsBadge(t.status)}</div>
       </div>
       <div style="font-size:.82rem;color:var(--text-light);margin-bottom:.35rem">${t.desc}</div>
-      ${t.location?`<div style="font-size:.8rem;color:var(--primary);margin-bottom:.3rem">📍 ${t.location}</div>`:''}
+      ${t.location?`<div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;flex-wrap:wrap">
+        <span style="font-size:.8rem;color:var(--primary)">📍 ${t.location}</span>
+        <a href="https://waze.com/ul?q=${encodeURIComponent(t.location)}&navigate=yes" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="background:#00d4e1;color:#fff;border-radius:.3rem;padding:.15rem .45rem;font-size:.72rem;font-weight:700;text-decoration:none">🗺️ Waze</a>
+      </div>`:''}
       ${eqNames.length?`<div style="font-size:.8rem;color:#7c3aed">🎒 ${eqNames.join(' | ')}</div>`:''}
       <div style="font-size:.75rem;color:var(--text-light);margin-top:.4rem">📅 ${t.date} · לחץ לפרטים ועדכון</div>
     </div>`;
@@ -965,7 +969,9 @@ function renderAdminDamage(){
   const tb=document.getElementById('a-damage-table');
   tb.innerHTML=damageReports.length?damageReports.map(d=>{
     const sb=d.status==='תוקן'?'<span class="badge badge-green">תוקן</span>':'<span class="badge badge-yellow">בתיקון</span>';
-    const acts=d.status!=='תוקן'?`<button class="btn btn-success btn-sm" onclick="markFixed(${d.id})">✓ תוקן</button> <button class="btn btn-danger btn-sm" onclick="scrapDmg(${d.id})">🗑️ גרוט</button>`:'';
+    const acts=d.status!=='תוקן'
+      ?`<button class="btn btn-success btn-sm" onclick="markFixed(${d.id})">✓ תוקן</button> <button class="btn btn-danger btn-sm" onclick="scrapDmg(${d.id})">🗑️ גרוט</button>`
+      :`<button class="btn btn-danger btn-sm" onclick="deleteDmgReport(${d.id})">🗑️ מחק</button>`;
     return `<tr><td><strong>${d.equipmentName}</strong></td><td>${d.reportedBy}</td><td>${d.desc}</td><td>${sevBadge(d.severity)}</td><td>${sb}</td><td>${acts} <button class="btn btn-ghost btn-sm" onclick="showDmgDetails(${d.id})">📄 פרטים</button></td></tr>`;
   }).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--text-light)">אין דוחות נזק</td></tr>';
 }
@@ -1206,8 +1212,9 @@ function addTask(){
   const date=document.getElementById('nt-date').value;
   const location=document.getElementById('nt-location').value.trim();
   const equipmentIds=[...document.querySelectorAll('#nt-eq-list input:checked')].map(cb=>parseInt(cb.value));
-  tasks.push({id:nid.task++,title,desc:document.getElementById('nt-desc').value.trim(),assignedTo:assignee,date:date?date.split('-').reverse().join('/'):today(),priority:document.getElementById('nt-priority').value,status:'פתוח',notes:'',location,equipmentIds});
-  ['nt-title','nt-desc','nt-date','nt-location'].forEach(id=>document.getElementById(id).value='');
+  const initNotes=document.getElementById('nt-notes-field').value.trim();
+  tasks.push({id:nid.task++,title,desc:document.getElementById('nt-desc').value.trim(),assignedTo:assignee,date:date?date.split('-').reverse().join('/'):today(),priority:document.getElementById('nt-priority').value,status:'פתוח',notes:initNotes,location,equipmentIds});
+  ['nt-title','nt-desc','nt-date','nt-location','nt-notes-field'].forEach(id=>document.getElementById(id).value='');
   closeModal('add-task-modal');renderAdminTasks();renderAdminOverview();saveData();showToast('המשימה נוצרה ✅');checkTasksAutoExport();
 }
 function deleteTask(id){
@@ -1242,7 +1249,14 @@ function openUserTask(id){
   document.getElementById('ut-details').innerHTML=`
     <div class="task-detail-block"><div class="task-detail-label">כותרת</div><div class="task-detail-value">${t.title}</div></div>
     ${t.desc?`<div class="task-detail-block"><div class="task-detail-label">תיאור</div><div class="task-detail-value">${t.desc}</div></div>`:''}
-    ${t.location?`<div class="task-detail-block" style="border-right-color:var(--warning)"><div class="task-detail-label">📍 מיקום האירוע</div><div class="task-detail-value" style="font-weight:700">${t.location}</div></div>`:''}
+    ${t.location?`<div class="task-detail-block" style="border-right-color:var(--warning)">
+      <div class="task-detail-label">📍 מיקום האירוע</div>
+      <div class="task-detail-value" style="font-weight:700;margin-bottom:.5rem">${t.location}</div>
+      <a href="https://waze.com/ul?q=${encodeURIComponent(t.location)}&navigate=yes" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:.35rem;background:#00d4e1;color:#fff;border-radius:.4rem;padding:.35rem .75rem;font-size:.82rem;font-weight:700;text-decoration:none">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M12 1C6.48 1 2 5.48 2 11c0 3.54 1.83 6.65 4.6 8.47L6 22l3.1-1.55A9.93 9.93 0 0012 21c5.52 0 10-4.48 10-10S17.52 1 12 1zm1 15h-2v-6h2v6zm0-8h-2V6h2v2z"/></svg>
+        נווט עם Waze
+      </a>
+    </div>`:''}
     ${eqNames?`<div class="task-detail-block" style="border-right-color:var(--purple)"><div class="task-detail-label">🎒 ציוד שצריך לקחת</div><div style="margin-top:.3rem">${eqNames}</div></div>`:''}
     <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:.5rem">
       <span>${pBadge(t.priority)}</span><span>${tsBadge(t.status)}</span><span style="font-size:.8rem;color:var(--text-light)">📅 ${t.date}</span>
@@ -1280,6 +1294,14 @@ function scrapDmg(id){
   if(!confirm(`לגרוט דוח נזק על "${d.equipmentName}"?`))return;
   damageReports=damageReports.filter(x=>x.id!==id);
   renderAdminDamage();renderAdminOverview();saveData();showToast('הדוח הוסר ✅');
+}
+function deleteDmgReport(id){
+  const d=damageReports.find(x=>x.id===id);if(!d)return;
+  if(!confirm(`למחוק דוח נזק מטופל על "${d.equipmentName}"?\nהציוד יסומן כזמין במערכת.`))return;
+  const e=equipment.find(x=>x.name===d.equipmentName);
+  if(e&&(e.status==='ניזוק'||e.status==='בתיקון'))e.status='זמין';
+  damageReports=damageReports.filter(x=>x.id!==id);
+  renderAdminDamage();renderAdminEq();renderAdminOverview();saveData();showToast('הדוח נמחק והציוד עודכן כזמין ✅');
 }
 function showDmgDetails(id){
   const d=damageReports.find(x=>x.id===id);if(!d)return;
