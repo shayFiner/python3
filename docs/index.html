@@ -537,20 +537,46 @@ tbody tr:hover{background:#f8fafc}
 
 <script>
 // ===== DATA =====
-let USERS = [
-  {id:1,username:'admin',password:'admin123',pin:'',isAdmin:true,fullName:'מנהל מערכת',active:true}
-];
+const DEFAULT_USERS = [{id:1,username:'admin',password:'admin123',pin:'',isAdmin:true,fullName:'מנהל מערכת',active:true}];
+const STORAGE_KEY = 'indorski_data';
+
+function saveData(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({USERS,equipment,categories,damageReports,tasks,history,chatMessages,systemSettings,permissions,nid}));
+  }catch(e){}
+}
+function loadData(){
+  try{
+    const raw=localStorage.getItem(STORAGE_KEY);
+    if(!raw)return;
+    const d=JSON.parse(raw);
+    if(d.USERS)USERS=d.USERS;
+    if(d.equipment)equipment=d.equipment;
+    if(d.categories)categories=d.categories;
+    if(d.damageReports)damageReports=d.damageReports;
+    if(d.tasks)tasks=d.tasks;
+    if(d.history)history=d.history;
+    if(d.chatMessages)chatMessages=d.chatMessages;
+    if(d.systemSettings)systemSettings=d.systemSettings;
+    if(d.permissions)permissions=d.permissions;
+    if(d.nid)nid=d.nid;
+  }catch(e){}
+}
+
+let USERS = [...DEFAULT_USERS];
 let equipment = [];
 let categories = ['אודיו','תמיכה','כבלים','תאורה','וידאו','אחר'];
 let damageReports = [];
-let tasks = []; // {id,title,desc,assignedTo:userId,date,priority,status,notes}
+let tasks = [];
 let history = [];
-let chatMessages = []; // {id,fromId,toId:null=group,fromName,text,time}
+let chatMessages = [];
 let systemSettings = {name:'מערכת ניהול ציוד',company:'אינדורסקי הפקות'};
 let permissions = {canReportDamage:true,canCheckout:true,canCheckin:true,historyVisible:true};
 let nid = {eq:1,task:1,dmg:1,chat:1,user:2};
 let currentUser = null;
-let chatTarget = null; // null=group, userId=private
+let chatTarget = null;
+
+loadData(); // טען נתונים שמורים בטעינת הדף
 
 // ===== AUTH =====
 function doLogin(){
@@ -842,10 +868,28 @@ function changeAdminPw(){
   if(!pw){alert('יש להזין סיסמה');return;}
   if(pw!==pw2){alert('הסיסמאות לא תואמות');return;}
   if(pw.length<4){alert('סיסמה קצרה מדי (מינימום 4 תווים)');return;}
-  currentUser.password=pw;
+  const u=USERS.find(x=>x.id===currentUser.id);
+  if(u){u.password=pw;currentUser.password=pw;}
   document.getElementById('admin-new-pw').value='';
   document.getElementById('admin-new-pw2').value='';
-  showToast('הסיסמה שונתה בהצלחה ✅');
+  saveData();showToast('הסיסמה שונתה בהצלחה ✅');
+}
+function changeAdminUsername(){
+  const newName=document.getElementById('admin-new-username').value.trim();
+  const newFull=document.getElementById('admin-new-fullname').value.trim();
+  if(!newName&&!newFull){alert('יש להזין לפחות שדה אחד');return;}
+  const u=USERS.find(x=>x.id===currentUser.id);
+  if(u){
+    if(newName){
+      if(USERS.find(x=>x.username===newName&&x.id!==u.id)){alert('שם משתמש כבר קיים');return;}
+      u.username=newName;currentUser.username=newName;
+    }
+    if(newFull){u.fullName=newFull;currentUser.fullName=newFull;}
+  }
+  document.getElementById('admin-new-username').value='';
+  document.getElementById('admin-new-fullname').value='';
+  document.getElementById('sys-name-admin').textContent=systemSettings.name;
+  saveData();showToast('הפרטים עודכנו ✅');
 }
 function renderAdminsList(){
   const el=document.getElementById('admins-list');
